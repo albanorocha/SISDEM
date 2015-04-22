@@ -6,7 +6,12 @@
 package src;
 
 import java.awt.Color;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
+//import javax.swing.ImageIcon;
 
 /**
  *
@@ -14,25 +19,27 @@ import javax.swing.ImageIcon;
  */
 public class MainFrame extends javax.swing.JFrame {
 
-    private int decimalValue, gate;
-    private boolean mode, controlBy;        
+    // Defines
+    private static final boolean BY_SOFTWARE = true;
+    private static final boolean BY_HARDWARE = false;
+    private static final boolean BIN_MODE = true;
+    private static final boolean GATES_MODE = false;
+    private final int BAUD_RATE = 9600;
+    // Variables
+    private SerialCOM arduinoUNO;
+    private String comPortID;
+    private int decimalValue, gate, buttonInput1, buttonInput2;
+    private boolean operationMode, operationalControl;
 
     /**
-     * Creates new form tela
+     * Default constructor
      */
     public MainFrame() {
         initComponents();
-        controlBy = false; // False = Software | True = Hardware
-        jCheckBoxSoftware.setSelected(true);
-        jCheckBoxHardware.setSelected(false);
-        mode = true; // False = GatesMode | True = BinMode
-        binMode.setSelected(true);
-        gatesMode.setSelected(false);
-        jComboBoxGatesMenu.setEnabled(false);
-        jToggleButtonInput1.setEnabled(false);
-        jToggleButtonInput2.setEnabled(false);
-        //jButtonSync.setIcon(new ImageIcon(("sync.jpg")));            
-        decimalValue = gate = 0;
+        arduinoUNO = null;
+        restartInterface();
+        // Select COM7 wich default
+        comPortID = "COM" + Integer.toString(jComboBoxSerialCOM.getSelectedIndex() + 1);
     }
 
     /**
@@ -79,17 +86,18 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
-        binMode = new javax.swing.JRadioButton();
-        gatesMode = new javax.swing.JRadioButton();
-        jPanelConnection = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jRadioBuutonBinMode = new javax.swing.JRadioButton();
+        jRadioButtonGatesMode = new javax.swing.JRadioButton();
+        jPanelConnectionStatus = new javax.swing.JPanel();
+        jPanelBySoftwareColor = new javax.swing.JPanel();
         jCheckBoxSoftware = new javax.swing.JCheckBox();
-        jPanel3 = new javax.swing.JPanel();
+        jPanelByHardwareColor = new javax.swing.JPanel();
         jCheckBoxHardware = new javax.swing.JCheckBox();
         jButtonConnect = new javax.swing.JButton();
         jButtonDisconnect = new javax.swing.JButton();
         jToggleButtonInput1 = new javax.swing.JToggleButton();
         jToggleButtonInput2 = new javax.swing.JToggleButton();
+        jComboBoxSerialCOM = new javax.swing.JComboBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuItemRestart = new javax.swing.JMenuItem();
@@ -103,8 +111,11 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuConnection = new javax.swing.JMenu();
         jRadioButtonMenuItemConnected = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItemDisconnected = new javax.swing.JRadioButtonMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        jMenuOperationalMode = new javax.swing.JMenu();
+        jRadioButtonMenuItemBinary = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItemGates = new javax.swing.JRadioButtonMenuItem();
         jMenuHelp = new javax.swing.JMenu();
-        jMenuItemUpdate = new javax.swing.JMenuItem();
         jSeparator9 = new javax.swing.JPopupMenu.Separator();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
@@ -117,7 +128,17 @@ public class MainFrame extends javax.swing.JFrame {
         setResizable(false);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jComboBoxGatesMenu.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "NOT (NÃO)", "AND (E)", "OR (OU)", "NOR", "NAND", "XOR", "XNOR" }));
+        jComboBoxGatesMenu.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "LOGIC GATES", "NOT (NÃO)", "AND (E)", "OR (OU)", "NOR", "NAND", "XOR", "XNOR" }));
+        jComboBoxGatesMenu.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jComboBoxGatesMenuMouseClicked(evt);
+            }
+        });
+        jComboBoxGatesMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBoxGatesMenuActionPerformed(evt);
+            }
+        });
         getContentPane().add(jComboBoxGatesMenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 230, 130, 40));
 
         jSliderDSW3.setMaximum(1);
@@ -127,16 +148,10 @@ public class MainFrame extends javax.swing.JFrame {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jSliderDSW3MouseDragged(evt);
             }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jSliderDSW3MouseMoved(evt);
-            }
         });
         jSliderDSW3.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jSliderDSW3MouseClicked(evt);
-            }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jSliderDSW3MouseEntered(evt);
             }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jSliderDSW3MousePressed(evt);
@@ -152,22 +167,13 @@ public class MainFrame extends javax.swing.JFrame {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jSliderDSW2MouseDragged(evt);
             }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jSliderDSW2MouseMoved(evt);
-            }
         });
         jSliderDSW2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jSliderDSW2MouseClicked(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jSliderDSW2MouseEntered(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jSliderDSW2MousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jSliderDSW2MouseReleased(evt);
             }
         });
         getContentPane().add(jSliderDSW2, new org.netbeans.lib.awtextra.AbsoluteConstraints(273, 150, 30, 50));
@@ -179,22 +185,13 @@ public class MainFrame extends javax.swing.JFrame {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 jSliderDSW1MouseDragged(evt);
             }
-            public void mouseMoved(java.awt.event.MouseEvent evt) {
-                jSliderDSW1MouseMoved(evt);
-            }
         });
         jSliderDSW1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jSliderDSW1MouseClicked(evt);
             }
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                jSliderDSW1MouseEntered(evt);
-            }
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jSliderDSW1MousePressed(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                jSliderDSW1MouseReleased(evt);
             }
         });
         getContentPane().add(jSliderDSW1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 150, 40, 50));
@@ -345,8 +342,8 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 10, -1, -1));
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 3, 12)); // NOI18N
-        jLabel9.setText("Connection - USB");
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 310, 110, -1));
+        jLabel9.setText("Serial Communication");
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 315, 140, -1));
 
         jLabel10.setFont(new java.awt.Font("Tahoma", 3, 12)); // NOI18N
         jLabel10.setText("Action Modes");
@@ -354,32 +351,32 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel11.setFont(new java.awt.Font("Tahoma", 3, 12)); // NOI18N
         jLabel11.setText("Control Mode");
-        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 310, 100, -1));
+        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 314, 100, -1));
 
         jLabel12.setFont(new java.awt.Font("Tahoma", 3, 10)); // NOI18N
         jLabel12.setText("PushButtons");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 230, 70, -1));
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(255, 230, 70, -1));
 
         jLabel13.setText("7");
         getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 46, 10, -1));
 
         jLabel14.setText("1");
-        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 46, 10, -1));
+        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(377, 46, 10, -1));
 
         jLabel15.setText("2");
-        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 46, 10, -1));
+        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(317, 46, 10, -1));
 
         jLabel16.setText("3");
-        getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 46, 10, -1));
+        getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(257, 46, 10, -1));
 
         jLabel17.setText("4");
-        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 46, 10, -1));
+        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(197, 46, 10, -1));
 
         jLabel18.setText("5");
-        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 46, 10, -1));
+        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(137, 46, 10, -1));
 
         jLabel19.setText("6");
-        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 46, 10, -1));
+        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(77, 46, 10, -1));
 
         jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
         getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 310, 10, 90));
@@ -392,102 +389,149 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator6.setBackground(new java.awt.Color(0, 0, 0));
         getContentPane().add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 30, 105, 10));
 
-        binMode.setSelected(true);
-        binMode.setText("Bin2Dec");
-        binMode.addActionListener(new java.awt.event.ActionListener() {
+        jRadioBuutonBinMode.setSelected(true);
+        jRadioBuutonBinMode.setText("Bin2Dec");
+        jRadioBuutonBinMode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                binModeActionPerformed(evt);
+                jRadioBuutonBinModeActionPerformed(evt);
             }
         });
-        getContentPane().add(binMode, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 120, 30));
+        getContentPane().add(jRadioBuutonBinMode, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 120, 30));
 
-        gatesMode.setText("Gates");
-        gatesMode.addActionListener(new java.awt.event.ActionListener() {
+        jRadioButtonGatesMode.setText("Gates");
+        jRadioButtonGatesMode.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gatesModeActionPerformed(evt);
+                jRadioButtonGatesModeActionPerformed(evt);
             }
         });
-        getContentPane().add(gatesMode, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 110, 40));
+        getContentPane().add(jRadioButtonGatesMode, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 180, 110, 40));
 
-        jPanelConnection.setBackground(new java.awt.Color(255, 0, 0));
+        jPanelConnectionStatus.setBackground(new java.awt.Color(255, 0, 0));
 
-        javax.swing.GroupLayout jPanelConnectionLayout = new javax.swing.GroupLayout(jPanelConnection);
-        jPanelConnection.setLayout(jPanelConnectionLayout);
-        jPanelConnectionLayout.setHorizontalGroup(
-            jPanelConnectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout jPanelConnectionStatusLayout = new javax.swing.GroupLayout(jPanelConnectionStatus);
+        jPanelConnectionStatus.setLayout(jPanelConnectionStatusLayout);
+        jPanelConnectionStatusLayout.setHorizontalGroup(
+            jPanelConnectionStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 0, Short.MAX_VALUE)
         );
-        jPanelConnectionLayout.setVerticalGroup(
-            jPanelConnectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 50, Short.MAX_VALUE)
+        jPanelConnectionStatusLayout.setVerticalGroup(
+            jPanelConnectionStatusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 43, Short.MAX_VALUE)
         );
 
-        getContentPane().add(jPanelConnection, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 345, 50, 50));
+        getContentPane().add(jPanelConnectionStatus, new org.netbeans.lib.awtextra.AbsoluteConstraints(337, 350, 43, 43));
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 204));
+        jPanelBySoftwareColor.setBackground(new java.awt.Color(255, 255, 204));
 
         jCheckBoxSoftware.setSelected(true);
         jCheckBoxSoftware.setText("By Software");
+        jCheckBoxSoftware.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jCheckBoxSoftwareMouseClicked(evt);
+            }
+        });
+        jCheckBoxSoftware.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxSoftwareActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelBySoftwareColorLayout = new javax.swing.GroupLayout(jPanelBySoftwareColor);
+        jPanelBySoftwareColor.setLayout(jPanelBySoftwareColorLayout);
+        jPanelBySoftwareColorLayout.setHorizontalGroup(
+            jPanelBySoftwareColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelBySoftwareColorLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jCheckBoxSoftware, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        jPanelBySoftwareColorLayout.setVerticalGroup(
+            jPanelBySoftwareColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelBySoftwareColorLayout.createSequentialGroup()
                 .addComponent(jCheckBoxSoftware)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 340, 130, 22));
+        getContentPane().add(jPanelBySoftwareColor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 340, 130, 22));
 
-        jPanel3.setBackground(new java.awt.Color(204, 255, 255));
+        jPanelByHardwareColor.setBackground(new java.awt.Color(204, 255, 255));
 
         jCheckBoxHardware.setText("By Hardware");
+        jCheckBoxHardware.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jCheckBoxHardwareMouseClicked(evt);
+            }
+        });
+        jCheckBoxHardware.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBoxHardwareActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout jPanelByHardwareColorLayout = new javax.swing.GroupLayout(jPanelByHardwareColor);
+        jPanelByHardwareColor.setLayout(jPanelByHardwareColorLayout);
+        jPanelByHardwareColorLayout.setHorizontalGroup(
+            jPanelByHardwareColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelByHardwareColorLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jCheckBoxHardware, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+        jPanelByHardwareColorLayout.setVerticalGroup(
+            jPanelByHardwareColorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelByHardwareColorLayout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jCheckBoxHardware))
         );
 
-        getContentPane().add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 130, 22));
+        getContentPane().add(jPanelByHardwareColor, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 130, 22));
 
         jButtonConnect.setText("Connect");
-        getContentPane().add(jButtonConnect, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 340, 120, 25));
+        jButtonConnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonConnectActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonConnect, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 345, 110, 25));
 
         jButtonDisconnect.setText("Disconnect");
-        getContentPane().add(jButtonDisconnect, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 370, 120, 25));
+        jButtonDisconnect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDisconnectActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonDisconnect, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 375, 110, 25));
 
         jToggleButtonInput1.setBackground(java.awt.Color.white);
-        jToggleButtonInput1.setForeground(java.awt.Color.white);
-        jToggleButtonInput1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/pb1.jpg"))); // NOI18N
-        getContentPane().add(jToggleButtonInput1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 250, 58, 45));
+        jToggleButtonInput1.setText("OFF");
+        jToggleButtonInput1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonInput1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jToggleButtonInput1, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 250, 55, 40));
 
         jToggleButtonInput2.setBackground(new java.awt.Color(255, 255, 255));
-        jToggleButtonInput2.setForeground(new java.awt.Color(255, 255, 255));
-        jToggleButtonInput2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/pb2.jpg"))); // NOI18N
-        getContentPane().add(jToggleButtonInput2, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 250, 58, 45));
+        jToggleButtonInput2.setText("OFF");
+        jToggleButtonInput2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButtonInput2ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jToggleButtonInput2, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 250, 55, 40));
+
+        jComboBoxSerialCOM.setFont(new java.awt.Font("Tahoma", 0, 9)); // NOI18N
+        jComboBoxSerialCOM.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7" }));
+        jComboBoxSerialCOM.setOpaque(false);
+        getContentPane().add(jComboBoxSerialCOM, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 310, 70, 30));
 
         jMenuFile.setMnemonic('F');
         jMenuFile.setText("File");
 
-        jMenuItemRestart.setMnemonic('R');
         jMenuItemRestart.setText("Restart");
+        jMenuItemRestart.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemRestartActionPerformed(evt);
+            }
+        });
         jMenuFile.add(jMenuItemRestart);
         jMenuFile.add(jSeparator7);
 
@@ -503,15 +547,16 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuBar1.add(jMenuFile);
         jMenuFile.getAccessibleContext().setAccessibleDescription("");
 
-        jMenuEdit.setText("Edit");
+        jMenuEdit.setMnemonic('S');
+        jMenuEdit.setText("Status");
 
         jMenuContolMode.setText("Control Mode");
 
         jRadioButtonMenuItemSoftware.setSelected(true);
-        jRadioButtonMenuItemSoftware.setText("Controled by Software");
+        jRadioButtonMenuItemSoftware.setText("By Software");
         jMenuContolMode.add(jRadioButtonMenuItemSoftware);
 
-        jRadioButtonMenuItemHardware.setText("Controled by Hardware");
+        jRadioButtonMenuItemHardware.setText("By Hardware");
         jMenuContolMode.add(jRadioButtonMenuItemHardware);
 
         jMenuEdit.add(jMenuContolMode);
@@ -527,22 +572,28 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuConnection.add(jRadioButtonMenuItemDisconnected);
 
         jMenuEdit.add(jMenuConnection);
+        jMenuEdit.add(jSeparator2);
+
+        jMenuOperationalMode.setText("Operational Mode");
+
+        jRadioButtonMenuItemBinary.setSelected(true);
+        jRadioButtonMenuItemBinary.setText("Binary");
+        jMenuOperationalMode.add(jRadioButtonMenuItemBinary);
+
+        jRadioButtonMenuItemGates.setSelected(true);
+        jRadioButtonMenuItemGates.setText("Gates");
+        jMenuOperationalMode.add(jRadioButtonMenuItemGates);
+
+        jMenuEdit.add(jMenuOperationalMode);
 
         jMenuBar1.add(jMenuEdit);
 
         jMenuHelp.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/help.png"))); // NOI18N
+        jMenuHelp.setMnemonic('H');
         jMenuHelp.setText("Help");
-
-        jMenuItemUpdate.setText("Update");
-        jMenuHelp.add(jMenuItemUpdate);
         jMenuHelp.add(jSeparator9);
 
         jMenuItemAbout.setText("About");
-        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemAboutActionPerformed(evt);
-            }
-        });
         jMenuHelp.add(jMenuItemAbout);
 
         jMenuBar1.add(jMenuHelp);
@@ -552,36 +603,63 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
- 
-    
-    private void binModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binModeActionPerformed
+
+    /**
+     *
+     */
+    private void restartInterface() {
+        allLedsOFF();
+        // Starts all interger variables
+        decimalValue = gate = buttonInput1 = buttonInput2 = 0;
+        // Starts controled by software
+        operationalControl = BY_SOFTWARE;
+        // Starts system in binary operation mode
+        operationMode = BIN_MODE;
+        // Starts all check boxes
+        jCheckBoxHardware.setSelected(false);
+        jCheckBoxSoftware.setSelected(true);
+        jCheckBoxSoftware.setSelected(true);
+        jCheckBoxHardware.setSelected(false);
+        // Starts all combo's boxes
         jComboBoxGatesMenu.setEnabled(false);
+        jComboBoxGatesMenu.setSelectedIndex(0);
+        if (arduinoUNO == null) { // If doesn't have connection
+            jComboBoxSerialCOM.setSelectedIndex(6);
+        }
+        // Starts all radio's buttons
+        jRadioBuutonBinMode.setSelected(true);
+        jRadioButtonGatesMode.setSelected(false);
+        // Starts all toggle's buttons
         jToggleButtonInput1.setEnabled(false);
         jToggleButtonInput2.setEnabled(false);
-        if (!binMode.isSelected() && mode == false) {
-            binMode.setSelected(true);
-        }
-        gatesMode.setSelected(false);
-        jSliderDSW1.setEnabled(true);
-        jSliderDSW2.setEnabled(true);
-        jSliderDSW3.setEnabled(true);
-    }//GEN-LAST:event_binModeActionPerformed
+        jToggleButtonInput1.setText("OFF");
+        jToggleButtonInput2.setText("OFF");
+        jToggleButtonInput1.setSelected(false);
+        jToggleButtonInput2.setSelected(false);
+        // Starts MENU bar
+        jRadioButtonMenuItemConnected.setEnabled(false);
+        jRadioButtonMenuItemConnected.setSelected(false);
+        jRadioButtonMenuItemDisconnected.setEnabled(false);
+        jRadioButtonMenuItemDisconnected.setSelected(true);
+        jRadioButtonMenuItemSoftware.setEnabled(false);
+        jRadioButtonMenuItemSoftware.setSelected(true);
+        jRadioButtonMenuItemHardware.setEnabled(false);
+        jRadioButtonMenuItemHardware.setSelected(false);
+        jRadioButtonMenuItemBinary.setEnabled(false);
+        jRadioButtonMenuItemBinary.setSelected(true);
+        jRadioButtonMenuItemGates.setEnabled(false);
+        jRadioButtonMenuItemGates.setSelected(false);
+        // Set dipswtichs values with zero
+        jSliderDSW1.setValue(0);
+        jSliderDSW2.setValue(0);
+        jSliderDSW3.setValue(0);
+    }
 
-    private void gatesModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gatesModeActionPerformed
-        jComboBoxGatesMenu.setEnabled(true);
-        jToggleButtonInput1.setEnabled(true);
-        jToggleButtonInput2.setEnabled(true);
-        if (!gatesMode.isSelected() && mode == true) {
-            gatesMode.setSelected(true);
-            mode = false;
-        }
-        binMode.setSelected(false);
-        jSliderDSW1.setEnabled(false);
-        jSliderDSW2.setEnabled(false);
-        jSliderDSW3.setEnabled(false);
-    }//GEN-LAST:event_gatesModeActionPerformed
-
-    public void refreshLeds() {
+    /**
+     *
+     */
+    private void allLedsOFF() {
+        // Set all leds OFF
         jPanelLed1.setBackground(Color.GRAY);
         jPanelLed2.setBackground(Color.GRAY);
         jPanelLed3.setBackground(Color.GRAY);
@@ -589,130 +667,304 @@ public class MainFrame extends javax.swing.JFrame {
         jPanelLed5.setBackground(Color.GRAY);
         jPanelLed6.setBackground(Color.GRAY);
         jPanelLed7.setBackground(Color.GRAY);
-        decimalValue = jSliderDSW1.getValue() + jSliderDSW2.getValue() * 2 + jSliderDSW3.getValue() * 4;
-        switch (decimalValue) {
-            case 1:
-                jPanelLed1.setBackground(Color.GREEN);
-                break;
-            case 2:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                break;
-            case 3:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                jPanelLed3.setBackground(Color.GREEN);
-                break;
-            case 4:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                jPanelLed3.setBackground(Color.GREEN);
-                jPanelLed4.setBackground(Color.GREEN);
-                break;
-            case 5:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                jPanelLed3.setBackground(Color.GREEN);
-                jPanelLed4.setBackground(Color.GREEN);
-                jPanelLed5.setBackground(Color.GREEN);
-                break;
-            case 6:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                jPanelLed3.setBackground(Color.GREEN);
-                jPanelLed4.setBackground(Color.GREEN);
-                jPanelLed5.setBackground(Color.GREEN);
-                jPanelLed6.setBackground(Color.GREEN);
-                break;
-            case 7:
-                jPanelLed1.setBackground(Color.GREEN);
-                jPanelLed2.setBackground(Color.GREEN);
-                jPanelLed3.setBackground(Color.GREEN);
-                jPanelLed4.setBackground(Color.GREEN);
-                jPanelLed5.setBackground(Color.GREEN);
-                jPanelLed6.setBackground(Color.GREEN);
-                jPanelLed7.setBackground(Color.GREEN);
-                break;
-            default:
-                break;
-        }
     }
 
+    /**
+     *
+     */
+    private void allLedsON() {
+        // Set all leds ON
+        jPanelLed1.setBackground(Color.GREEN);
+        jPanelLed2.setBackground(Color.GREEN);
+        jPanelLed3.setBackground(Color.GREEN);
+        jPanelLed4.setBackground(Color.GREEN);
+        jPanelLed5.setBackground(Color.GREEN);
+        jPanelLed6.setBackground(Color.GREEN);
+        jPanelLed7.setBackground(Color.GREEN);
+    }
+
+    /**
+     *
+     */
+    private void action() {
+        int gateResult = 0;
+        if (operationMode == BIN_MODE) {
+            allLedsOFF();
+            decimalValue = jSliderDSW1.getValue() + jSliderDSW2.getValue() * 2 + jSliderDSW3.getValue() * 4;
+            switch (decimalValue) {
+                case 1:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    break;
+                case 2:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    jPanelLed2.setBackground(Color.GREEN);
+                    break;
+                case 3:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    jPanelLed2.setBackground(Color.GREEN);
+                    jPanelLed3.setBackground(Color.GREEN);
+                    break;
+                case 4:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    jPanelLed2.setBackground(Color.GREEN);
+                    jPanelLed3.setBackground(Color.GREEN);
+                    jPanelLed4.setBackground(Color.GREEN);
+                    break;
+                case 5:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    jPanelLed2.setBackground(Color.GREEN);
+                    jPanelLed3.setBackground(Color.GREEN);
+                    jPanelLed4.setBackground(Color.GREEN);
+                    jPanelLed5.setBackground(Color.GREEN);
+                    break;
+                case 6:
+                    jPanelLed1.setBackground(Color.GREEN);
+                    jPanelLed2.setBackground(Color.GREEN);
+                    jPanelLed3.setBackground(Color.GREEN);
+                    jPanelLed4.setBackground(Color.GREEN);
+                    jPanelLed5.setBackground(Color.GREEN);
+                    jPanelLed6.setBackground(Color.GREEN);
+                    break;
+                case 7:
+                    allLedsON();
+                    break;
+                default:
+                    break;
+            }
+            // Send int value to arduino board
+            if (arduinoUNO != null && (operationalControl == BY_SOFTWARE)) {
+                arduinoUNO.writeData(decimalValue);
+            }
+        } else if (operationMode == GATES_MODE) {
+            gate = jComboBoxGatesMenu.getSelectedIndex();
+            switch (gate) {
+                case 1: // NOT
+                    gateResult = buttonInput1;
+                    break;
+                case 2: // AND
+                    gateResult = buttonInput1 & buttonInput2;
+                    break;
+                case 3: // OR
+                    gateResult = buttonInput1 | buttonInput2;
+                    break;
+                case 4: // NOR
+                    gateResult = ((buttonInput1 | buttonInput2) == 1) ? 0 : 1;
+                    break;
+                case 5: // NAND
+                    gateResult = ((buttonInput1 & buttonInput2) == 1) ? 0 : 1;
+                    break;
+                case 6: // XOR
+                    gateResult = (buttonInput1 != buttonInput2) ? 1 : 0;
+                    break;
+                case 7: // XNOR
+                    gateResult = (buttonInput1 == buttonInput2) ? 1 : 0;
+                    break;
+                default:
+                    break;
+            }
+
+            // Define output value in Led1
+            if (gateResult == 1) {
+                jPanelLed1.setBackground(Color.GREEN);
+            } else {
+                jPanelLed1.setBackground(Color.GRAY);
+            }
+            if (arduinoUNO != null) {
+                arduinoUNO.writeData(gateResult);
+            }
+        }
+        //System.out.println(decimalValue);
+    }
+
+    private void jRadioBuutonBinModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioBuutonBinModeActionPerformed
+        // Enables
+        operationMode = BIN_MODE;
+        jRadioBuutonBinMode.setSelected(true);
+        jSliderDSW1.setEnabled(true);
+        jSliderDSW2.setEnabled(true);
+        jSliderDSW3.setEnabled(true);
+        // Disables
+        jComboBoxGatesMenu.setEnabled(false);
+        jToggleButtonInput1.setEnabled(false);
+        jToggleButtonInput2.setEnabled(false);
+        jRadioButtonGatesMode.setSelected(false);
+
+        action();
+    }//GEN-LAST:event_jRadioBuutonBinModeActionPerformed
+
+    private void jRadioButtonGatesModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonGatesModeActionPerformed
+        allLedsOFF();
+
+        // Enables
+        operationMode = GATES_MODE;
+        jRadioButtonGatesMode.setSelected(true);
+        jRadioButtonMenuItemGates.setSelected(true);
+        jComboBoxGatesMenu.setEnabled(true);
+        jToggleButtonInput1.setEnabled(true);
+        gate = jComboBoxGatesMenu.getSelectedIndex();
+        if (gate == 1) { // Port NOT type has been chosen
+            jToggleButtonInput2.setEnabled(false); // Disable second button input
+        } else {
+            jToggleButtonInput2.setEnabled(true);
+        }
+
+        // Disables
+        jRadioButtonMenuItemBinary.setSelected(false);
+        jRadioBuutonBinMode.setSelected(false);
+        jSliderDSW1.setEnabled(false);
+        jSliderDSW1.setValue(0);
+        jSliderDSW2.setEnabled(false);
+        jSliderDSW2.setValue(0);
+        jSliderDSW3.setEnabled(false);
+        jSliderDSW3.setValue(0);
+
+        action();
+    }//GEN-LAST:event_jRadioButtonGatesModeActionPerformed
+
     private void jSliderDSW3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MouseClicked
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW3MouseClicked
 
     private void jSliderDSW2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MouseClicked
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW2MouseClicked
 
     private void jSliderDSW1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MouseClicked
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW1MouseClicked
 
     private void jSliderDSW3MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MouseDragged
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW3MouseDragged
 
-    private void jSliderDSW3MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MouseMoved
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW3MouseMoved
-
-    private void jSliderDSW3MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MouseEntered
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW3MouseEntered
-
-    private void jSliderDSW3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MousePressed
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW3MousePressed
-
     private void jSliderDSW2MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MouseDragged
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW2MouseDragged
 
-    private void jSliderDSW2MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MouseEntered
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW2MouseEntered
-
-    private void jSliderDSW2MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MouseMoved
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW2MouseMoved
-
-    private void jSliderDSW2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MousePressed
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW2MousePressed
-
-    private void jSliderDSW2MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MouseReleased
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW2MouseReleased
-
     private void jSliderDSW1MouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MouseDragged
-        refreshLeds();
+        action();
     }//GEN-LAST:event_jSliderDSW1MouseDragged
 
-    private void jSliderDSW1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MouseEntered
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jSliderDSW1MouseEntered
-
-    private void jSliderDSW1MouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MouseMoved
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW1MouseMoved
-
-    private void jSliderDSW1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MousePressed
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW1MousePressed
-
-    private void jSliderDSW1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MouseReleased
-        refreshLeds();
-    }//GEN-LAST:event_jSliderDSW1MouseReleased
-
     private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
-        System.exit(EXIT_ON_CLOSE);
+        if (arduinoUNO != null) {
+            arduinoUNO.close();
+        }
+        System.exit(0);
     }//GEN-LAST:event_jMenuItemExitActionPerformed
 
-    private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
-      
-    }//GEN-LAST:event_jMenuItemAboutActionPerformed
+    private void jButtonConnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnectActionPerformed
+        if (arduinoUNO == null) {
+            comPortID = "COM" + Integer.toString(jComboBoxSerialCOM.getSelectedIndex() + 1);
+            arduinoUNO = new SerialCOM(comPortID, BAUD_RATE);
+            jRadioButtonMenuItemConnected.setSelected(true);
+            jRadioButtonMenuItemDisconnected.setSelected(false);
+            jButtonConnect.setEnabled(false);
+            jPanelConnectionStatus.setBackground(Color.GREEN);
+            jComboBoxSerialCOM.setEnabled(false);
+        } else {
+            //System.out.println("COM port already open.");
+            JOptionPane.showMessageDialog(null, "COM port already open.", "COM Open", JOptionPane.PLAIN_MESSAGE);
+        }
+    }//GEN-LAST:event_jButtonConnectActionPerformed
+
+    private void jButtonDisconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisconnectActionPerformed
+        if (this.arduinoUNO != null) {
+            try {
+                arduinoUNO.flushSerial();
+            } catch (IOException ex) {
+                Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            arduinoUNO.close();
+            jPanelConnectionStatus.setBackground(Color.RED);
+            jRadioButtonMenuItemConnected.setSelected(true);
+            jRadioButtonMenuItemDisconnected.setSelected(false);
+            jComboBoxSerialCOM.setEnabled(true);
+        }
+    }//GEN-LAST:event_jButtonDisconnectActionPerformed
+
+    private void jCheckBoxSoftwareMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCheckBoxSoftwareMouseClicked
+        // Enables
+        operationalControl = BY_SOFTWARE;
+        jCheckBoxSoftware.setSelected(true);
+        jRadioButtonMenuItemSoftware.setSelected(true);
+        // Disables
+        jCheckBoxHardware.setSelected(false);
+        jRadioButtonMenuItemHardware.setSelected(false);
+    }//GEN-LAST:event_jCheckBoxSoftwareMouseClicked
+
+    private void jCheckBoxHardwareMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCheckBoxHardwareMouseClicked
+        // Enables
+        operationalControl = BY_HARDWARE;
+        jCheckBoxHardware.setSelected(true);
+        jRadioButtonMenuItemHardware.setSelected(true);
+        // Disables
+        jCheckBoxSoftware.setSelected(false);
+        jRadioButtonMenuItemSoftware.setSelected(false);
+    }//GEN-LAST:event_jCheckBoxHardwareMouseClicked
+
+    private void jToggleButtonInput1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonInput1ActionPerformed
+        if (buttonInput1 == 0 && !jToggleButtonInput1.isSelected()) {
+            jToggleButtonInput1.setText("ON");
+            buttonInput1 = 1;
+        } else {
+            jToggleButtonInput1.setText("OFF");
+            buttonInput1 = 0;
+        }
+        action();
+    }//GEN-LAST:event_jToggleButtonInput1ActionPerformed
+
+    private void jToggleButtonInput2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButtonInput2ActionPerformed
+        if (buttonInput2 == 0 && !jToggleButtonInput2.isSelected()) {
+            jToggleButtonInput2.setText("ON");
+            buttonInput2 = 1;
+        } else {
+            jToggleButtonInput2.setText("OFF");
+            buttonInput2 = 0;
+        }
+        action();
+    }//GEN-LAST:event_jToggleButtonInput2ActionPerformed
+
+    private void jSliderDSW1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW1MousePressed
+        action();
+    }//GEN-LAST:event_jSliderDSW1MousePressed
+
+    private void jSliderDSW2MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW2MousePressed
+        action();
+    }//GEN-LAST:event_jSliderDSW2MousePressed
+
+    private void jSliderDSW3MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jSliderDSW3MousePressed
+        action();
+    }//GEN-LAST:event_jSliderDSW3MousePressed
+
+    private void jComboBoxGatesMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxGatesMenuActionPerformed
+        gate = jComboBoxGatesMenu.getSelectedIndex();
+        if (gate == 1) { // If NOT type gate has been chosen
+            jToggleButtonInput2.setEnabled(false); // Disable second input
+        } else {
+            jToggleButtonInput2.setEnabled(true); // Enable second input
+        }
+        action();
+    }//GEN-LAST:event_jComboBoxGatesMenuActionPerformed
+
+    private void jComboBoxGatesMenuMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jComboBoxGatesMenuMouseClicked
+        if (gate == 1) { // Port NOT type has been chosen
+            jToggleButtonInput2.setEnabled(false); // Disable second button input
+        } else {
+            jToggleButtonInput2.setEnabled(true);
+        }
+    }//GEN-LAST:event_jComboBoxGatesMenuMouseClicked
+
+    private void jCheckBoxSoftwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxSoftwareActionPerformed
+        jCheckBoxSoftwareMouseClicked(null);
+    }//GEN-LAST:event_jCheckBoxSoftwareActionPerformed
+
+    private void jCheckBoxHardwareActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBoxHardwareActionPerformed
+        jCheckBoxHardwareMouseClicked(null);
+    }//GEN-LAST:event_jCheckBoxHardwareActionPerformed
+
+    private void jMenuItemRestartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemRestartActionPerformed
+        restartInterface();
+    }//GEN-LAST:event_jMenuItemRestartActionPerformed
 
     /**
      * @param args the command line arguments
@@ -747,19 +999,18 @@ public class MainFrame extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MainFrame().setVisible(true);
+                (new MainFrame()).setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton binMode;
-    private javax.swing.JRadioButton gatesMode;
     private javax.swing.JButton jButtonConnect;
     private javax.swing.JButton jButtonDisconnect;
     private javax.swing.JCheckBox jCheckBoxHardware;
     private javax.swing.JCheckBox jCheckBoxSoftware;
     private javax.swing.JComboBox jComboBoxGatesMenu;
+    private javax.swing.JComboBox jComboBoxSerialCOM;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -788,10 +1039,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItemAbout;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemRestart;
-    private javax.swing.JMenuItem jMenuItemUpdate;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanelConnection;
+    private javax.swing.JMenu jMenuOperationalMode;
+    private javax.swing.JPanel jPanelByHardwareColor;
+    private javax.swing.JPanel jPanelBySoftwareColor;
+    private javax.swing.JPanel jPanelConnectionStatus;
     private javax.swing.JPanel jPanelLed1;
     private javax.swing.JPanel jPanelLed2;
     private javax.swing.JPanel jPanelLed3;
@@ -799,12 +1050,17 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPanel jPanelLed5;
     private javax.swing.JPanel jPanelLed6;
     private javax.swing.JPanel jPanelLed7;
+    private javax.swing.JRadioButton jRadioButtonGatesMode;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemBinary;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemConnected;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemDisconnected;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemGates;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemHardware;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItemSoftware;
+    private javax.swing.JRadioButton jRadioBuutonBinMode;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator10;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
