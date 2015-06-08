@@ -25,7 +25,7 @@ int const PSB_3 = A2;
 int const PSB_4 = A3;
 
 // Constant to define buffer's length 
-int const LENGTH_BUFFER = 14;
+int const LENGTH = 14;
 
 // Controllers variables
 int decimal_value_P1, decimal_value_P2 = 0;
@@ -34,8 +34,7 @@ int pushB_confirm_P1, pushB_skip_P1 = 0;
 int pushB_confirm_P2, pushB_skip_P2 = 0;
 
 // Buffer
-//int toSentDataBuffer[LENGTH_BUFFER];
-byte toSentDataBuffer[LENGTH_BUFFER];
+int toSentDataBuffer[LENGTH];
 //-------------------------------------------------------------------------------------//
 
 
@@ -112,13 +111,11 @@ void writeData(){
   toSentDataBuffer[12] = pushB_confirm_P2;
   toSentDataBuffer[13] = pushB_skip_P2;
   
-  Serial.write(toSentDataBuffer, LENGTH_BUFFER);
-  //for(int i = 0; i < LENGTH; i++){
-    //Serial.write(toSentDataBuffer[i]);
+  for(int i = 0; i < LENGTH; i++){
+    Serial.write(toSentDataBuffer[i]);
     //Serial.println(toSentDataBuffer[i]);
-  //}
+  }
   //Serial.println("---------------------------- FIM -----------------------------------");
-  
 }
 
 void defineButtonsBinary(){
@@ -149,7 +146,8 @@ void loop() {
   decimal_value_P2 = myBin2Dec(dsw_P2);
 
   // Writes values through serial communication to update software interface
-  writeData(); 
+  writeData();  
+
   delay(100);
 }
 

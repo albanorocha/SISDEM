@@ -13,6 +13,7 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import java.util.Enumeration;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -29,13 +30,14 @@ public class SerialCOM implements SerialPortEventListener {
         "/dev/ttyUSB0", // Linux
         "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9" // Windows
     };
+    
     private BufferedReader input;
     private OutputStream output;
     private static final int LENGTH_BUFFER = 14;
     private int counter;
     private int[] receivedDataBuffer;
-    private static final int TIME_OUT = 2000;
-    private static final int DATA_RATE = 9600;
+    private static final int TIME_OUT = 1000;
+    private static final int BAUD_RATE = 9600;
 
     public SerialCOM() {
         counter = 0;
@@ -55,7 +57,7 @@ public class SerialCOM implements SerialPortEventListener {
     }
 
     public static int getDATA_RATE() {
-        return DATA_RATE;
+        return BAUD_RATE;
     }
 
     public void initialize() {
@@ -73,13 +75,13 @@ public class SerialCOM implements SerialPortEventListener {
             }
         }
         if (portId == null) {
-            System.out.println("Could not find COM port.");
-            return;
+            JOptionPane.showMessageDialog(null, "Coul not find COM port.", "Error", 0);
+            System.exit(0);
         }
 
         try {
             serialPort = (SerialPort) portId.open(this.getClass().getName(), TIME_OUT);
-            serialPort.setSerialPortParams(DATA_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            serialPort.setSerialPortParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
             // open the streams
             input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
@@ -120,7 +122,7 @@ public class SerialCOM implements SerialPortEventListener {
         // Ignore all the other eventTypes, but you should consider the other ones.
     }
 
-    private void showData() {        
+    private void showData() {
         for (int i = 0; i < LENGTH_BUFFER; i++) {
             System.out.println(receivedDataBuffer[i]);
         }

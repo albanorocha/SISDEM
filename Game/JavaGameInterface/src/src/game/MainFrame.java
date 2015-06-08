@@ -25,7 +25,6 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     /**
      * Constants of the system
      */
-    private static final int LENGTH_BUFFER = 14;
     private static final DateFormat FORMATO = new SimpleDateFormat("mm:ss"); // Format the date type
 
     /**
@@ -358,7 +357,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
      * @param spe
      */
     @Override
-    public void serialEvent(SerialPortEvent spe) {
+    public synchronized void serialEvent(SerialPortEvent spe) {
         arduinoCommunication.serialEvent(spe);
     }
 
@@ -387,12 +386,16 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         Thread listenSerial = new Thread() {
             @Override
             public void run() {
-                //the following line will keep this app alive for 1000    seconds,
-                //waiting for events to occur and responding to them    (printing incoming messages to console).
-                try {
-                    Thread.sleep(1000000);
-                } catch (InterruptedException ie) {
-                }
+                /**
+                 * The following line will keep this app alive for 1000 seconds,
+                 * waiting for events to occur and responding to them (printing
+                 * incoming messages to console).
+                 */
+                //try {
+                //Thread.sleep(1000000);
+                //Thread.sleep(10000);
+                //} catch (InterruptedException ie) {
+                //}
             }
         };
         listenSerial.start();
