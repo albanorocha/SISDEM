@@ -25,7 +25,7 @@ int const PSB_3 = A2;
 int const PSB_4 = A3;
 
 // Constant to define buffer's length 
-int const LENGTH = 14;
+int const LENGTH_BUFFER = 14;
 
 // Controllers variables
 int decimal_value_P1, decimal_value_P2 = 0;
@@ -34,7 +34,8 @@ int pushB_confirm_P1, pushB_skip_P1 = 0;
 int pushB_confirm_P2, pushB_skip_P2 = 0;
 
 // Buffer
-int toSentDataBuffer[LENGTH];
+//int toSentDataBuffer[LENGTH];
+byte toSentDataBuffer[LENGTH_BUFFER];
 //-------------------------------------------------------------------------------------//
 
 
@@ -53,7 +54,8 @@ void setup() {
   pinMode(DSW_8, INPUT); // Bit 3 (DipSwitch_8)
   
   // Starts Serial Communication with 9600 baud rate value
-  Serial.begin(9600);
+  //Serial.begin(9600);
+  Serial.begin(57600);
 }
 
 // Function to convert binary value from dip switches in an equivalent decimal value
@@ -110,12 +112,15 @@ void writeData(){
   toSentDataBuffer[11] = dsw_P2[3];  
   toSentDataBuffer[12] = pushB_confirm_P2;
   toSentDataBuffer[13] = pushB_skip_P2;
+
+  Serial.write(toSentDataBuffer, LENGTH_BUFFER);
   
-  for(int i = 0; i < LENGTH; i++){
-    Serial.write(toSentDataBuffer[i]);
+  //for(int i = 0; i < LENGTH_BUFFER; i++){
+    //Serial.write(toSentDataBuffer[i]);
     //Serial.println(toSentDataBuffer[i]);
-  }
+  //}
   //Serial.println("---------------------------- FIM -----------------------------------");
+  
 }
 
 void defineButtonsBinary(){
@@ -123,12 +128,12 @@ void defineButtonsBinary(){
   
   // PLAYER 01
   pushB_confirm_P1 = (pushB_confirm_P1 > 1000) ? 1 : 0;
-  pushB_skip_P1 = (pushB_skip_P1 > 1000) ? 1 : 0;
-//  pushB_skip_P1 = (pushB_skip_P1 < 500) ? 1 : 0;
+  //pushB_skip_P1 = (pushB_skip_P1 > 1000) ? 1 : 0;
+  pushB_skip_P1 = (pushB_skip_P1 < 500) ? 1 : 0;
   // PLAYER 02
   pushB_confirm_P2 = (pushB_confirm_P2 > 1000) ? 1 : 0;
-  pushB_skip_P2 = (pushB_skip_P2 > 1000) ? 1 : 0;
-//  pushB_skip_P2 = (pushB_skip_P2 < 500) ? 1 : 0;      
+  //pushB_skip_P2 = (pushB_skip_P2 > 1000) ? 1 : 0;
+  pushB_skip_P2 = (pushB_skip_P2 < 500) ? 1 : 0;      
 }
 
 // Main Loop
@@ -147,7 +152,8 @@ void loop() {
 
   // Writes values through serial communication to update software interface
   writeData();  
-
-  delay(100);
+  
+  //
+  delay(150);
 }
 

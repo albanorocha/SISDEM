@@ -37,7 +37,8 @@ public class SerialCOM implements SerialPortEventListener {
     private int counter;
     private int[] receivedDataBuffer;
     private static final int TIME_OUT = 1000;
-    private static final int BAUD_RATE = 9600;
+    //private static final int BAUD_RATE = 9600;
+    private static final int BAUD_RATE = 57600;
 
     public SerialCOM() {
         counter = 0;
@@ -60,6 +61,9 @@ public class SerialCOM implements SerialPortEventListener {
         return BAUD_RATE;
     }
 
+    /**
+     * 
+     */
     public void initialize() {
         CommPortIdentifier portId = null;
         Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
@@ -94,6 +98,9 @@ public class SerialCOM implements SerialPortEventListener {
         }
     }
 
+    /**
+     * 
+     */
     public synchronized void close() {
         if (serialPort != null) {
             serialPort.removeEventListener();
@@ -101,6 +108,10 @@ public class SerialCOM implements SerialPortEventListener {
         }
     }
 
+    /**
+     * 
+     * @param oEvent 
+     */
     @Override
     public synchronized void serialEvent(SerialPortEvent oEvent) {
         if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
@@ -122,7 +133,10 @@ public class SerialCOM implements SerialPortEventListener {
         // Ignore all the other eventTypes, but you should consider the other ones.
     }
 
-    private void showData() {
+    /**
+     * 
+     */
+    private synchronized void showData() {
         for (int i = 0; i < LENGTH_BUFFER; i++) {
             System.out.println(receivedDataBuffer[i]);
         }
