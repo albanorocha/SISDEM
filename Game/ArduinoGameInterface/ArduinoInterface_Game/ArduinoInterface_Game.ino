@@ -54,8 +54,8 @@ void setup() {
   pinMode(DSW_8, INPUT); // Bit 3 (DipSwitch_8)
   
   // Starts Serial Communication with 9600 baud rate value
-  //Serial.begin(9600);
-  Serial.begin(57600);
+  Serial.begin(9600);
+  //Serial.begin(57600);
 }
 
 // Function to convert binary value from dip switches in an equivalent decimal value
@@ -154,6 +154,6 @@ void loop() {
   writeData();  
   
   //
-  delay(150);
+  delay(100);
 }
 

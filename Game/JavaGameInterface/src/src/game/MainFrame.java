@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -45,6 +46,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
          */
         initComponents();
         initVariables();
+        initInterface();
 
         /**
          * Starts thread to update counter.
@@ -70,6 +72,28 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         isPaused = true;
         // Get text that represents time in String format
         getCounterString();
+    }
+
+    /**
+     * 
+     */
+    private void initInterface() {
+        // Palyer 01        
+        jLabelStar1Player1.setVisible(false);
+        jLabelStar2Player1.setVisible(false);
+        jLabelStar3Player1.setVisible(false);
+        jLabelStar4Player1.setVisible(false);
+        jLabelStar5Player1.setVisible(false);
+        jLabelImgPlayer1Right.setVisible(false);
+        jLabelImgPlayer1Wrong.setVisible(false);
+        // Player 02
+        jLabelStar1Player2.setVisible(false);
+        jLabelStar2Player2.setVisible(false);
+        jLabelStar3Player2.setVisible(false);
+        jLabelStar4Player2.setVisible(false);
+        jLabelStar5Player2.setVisible(false);
+        jLabelImgPlayer2Right.setVisible(false);
+        jLabelImgPlayer2Wrong.setVisible(false);
     }
 
     /**
@@ -117,19 +141,19 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jLabelImgPlayer1Wrong = new javax.swing.JLabel();
         jLabelImgPlayer1Right = new javax.swing.JLabel();
         jLabelImgPlayer2Right = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
+        jLabelImgPlayer2Wrong = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
-        jLabel21 = new javax.swing.JLabel();
-        jLabel25 = new javax.swing.JLabel();
-        jLabel26 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jLabel28 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel29 = new javax.swing.JLabel();
-        jLabel30 = new javax.swing.JLabel();
-        jLabel31 = new javax.swing.JLabel();
-        jLabel32 = new javax.swing.JLabel();
+        jLabelStar5Player1 = new javax.swing.JLabel();
+        jLabelStar1Player1 = new javax.swing.JLabel();
+        jLabelStar2Player1 = new javax.swing.JLabel();
+        jLabelStar3Player1 = new javax.swing.JLabel();
+        jLabelStar4Player1 = new javax.swing.JLabel();
+        jLabelStar5Player2 = new javax.swing.JLabel();
+        jLabelStar1Player2 = new javax.swing.JLabel();
+        jLabelStar2Player2 = new javax.swing.JLabel();
+        jLabelStar3Player2 = new javax.swing.JLabel();
+        jLabelStar4Player2 = new javax.swing.JLabel();
         jLabel18 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -153,9 +177,9 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
 
         jTextFieldScorePlayer1.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
-        jTextFieldScorePlayer1.setText("50");
+        jTextFieldScorePlayer1.setText("0");
         jTextFieldScorePlayer1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        getContentPane().add(jTextFieldScorePlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 200, 70));
+        getContentPane().add(jTextFieldScorePlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 70, 200, 70));
 
         jButtonStart.setText("INICIAR");
         jButtonStart.addActionListener(new java.awt.event.ActionListener() {
@@ -163,7 +187,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                 jButtonStartActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 590, 220, 90));
+        getContentPane().add(jButtonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 590, 220, 50));
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jLabel7.setText("TEMPO RESTANTE");
@@ -179,10 +203,10 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                 jToggleButtonPauseActionPerformed(evt);
             }
         });
-        getContentPane().add(jToggleButtonPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 590, 150, 40));
+        getContentPane().add(jToggleButtonPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 590, 160, 100));
 
-        jButtonClear.setText("ZERAR");
-        getContentPane().add(jButtonClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 640, 150, 40));
+        jButtonClear.setText("REINICIAR");
+        getContentPane().add(jButtonClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jLabel9.setText("DURAÇÃO DA PARTIDA");
@@ -195,11 +219,11 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 250, 190, 20));
 
         jLabel12.setText("PONTUAÇÃO :");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 100, -1, -1));
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 100, -1, -1));
 
         jTextFieldScorePlayer2.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
-        jTextFieldScorePlayer2.setText("60");
-        getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 70, 200, 70));
+        jTextFieldScorePlayer2.setText("0");
+        getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 70, 200, 70));
 
         jLabel14.setText("VALOR INFORMADO (JOGADOR)");
         getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 380, 190, 20));
@@ -210,16 +234,18 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jSpinnerMinutes.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jSpinnerMinutes.setToolTipText("");
         jSpinnerMinutes.setName(""); // NOI18N
+        jSpinnerMinutes.setValue(2);
         getContentPane().add(jSpinnerMinutes, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 610, 80, 70));
 
         jSpinnerSeconds.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jSpinnerSeconds.setValue(30);
         getContentPane().add(jSpinnerSeconds, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 610, 80, 70));
 
         jLabel4.setText("Minutos");
-        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 590, 40, -1));
+        getContentPane().add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 590, 50, -1));
 
         jLabel6.setText("Segundos");
-        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 590, 50, -1));
+        getContentPane().add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 590, 60, -1));
 
         jLabel16.setFont(new java.awt.Font("Tahoma", 1, 30)); // NOI18N
         jLabel16.setText(":");
@@ -240,36 +266,28 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         getContentPane().add(jButtonSetCounter, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 600, 150, 80));
 
         jTextFieldDecimalRandom2.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        jTextFieldDecimalRandom2.setText("12");
         getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 400, 120, 100));
 
         jTextFieldDecimalRandom1.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        jTextFieldDecimalRandom1.setText("10");
         getContentPane().add(jTextFieldDecimalRandom1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 120, 100));
 
         jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        jTextFieldDecimalPlayer1.setText("15");
         getContentPane().add(jTextFieldDecimalPlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 120, 100));
 
         jTextFieldDecimalRandom3.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        jTextFieldDecimalRandom3.setText("12");
         getContentPane().add(jTextFieldDecimalRandom3, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 270, 120, 100));
-        getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 540, 1330, -1));
+        getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 520, 1330, 10));
 
         jTextField1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextField1.setText("1 1 1 1");
         getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 425, 180, 55));
 
         jTextField2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextField2.setText("1 1 0 0");
         getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 420, 180, 55));
 
         jTextField3.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextField3.setText("1 0 1 0");
         getContentPane().add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 180, 55));
 
         jTextField4.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextField4.setText("1 1 0 0");
         getContentPane().add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 300, 180, 55));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 120)); // NOI18N
@@ -288,59 +306,59 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jLabelImgPlayer2Right.setText("Right");
         getContentPane().add(jLabelImgPlayer2Right, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 300, 160, 150));
 
-        jLabel19.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/wrong.jpg"))); // NOI18N
-        jLabel19.setText("Wrong");
-        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 300, 160, 150));
+        jLabelImgPlayer2Wrong.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/wrong.jpg"))); // NOI18N
+        jLabelImgPlayer2Wrong.setText("Wrong");
+        getContentPane().add(jLabelImgPlayer2Wrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 300, 160, 150));
 
-        jLabel13.setText("Estrelas : ");
-        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 180, -1, -1));
+        jLabel13.setText("ESTRELAS:");
+        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 190, -1, -1));
 
-        jLabel17.setText("Estrelas : ");
+        jLabel17.setText("ESTRELAS:");
         getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, -1, -1));
 
-        jLabel21.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel21.setText("star1");
-        getContentPane().add(jLabel21, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 170, 50, 50));
+        jLabelStar5Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar5Player1.setText("star1");
+        getContentPane().add(jLabelStar5Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 170, 50, 50));
 
-        jLabel25.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel25.setText("star1");
-        getContentPane().add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 170, 50, 50));
+        jLabelStar1Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar1Player1.setText("star1");
+        getContentPane().add(jLabelStar1Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 50, 50));
 
-        jLabel26.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel26.setText("star1");
-        getContentPane().add(jLabel26, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 170, 50, 50));
+        jLabelStar2Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar2Player1.setText("star1");
+        getContentPane().add(jLabelStar2Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 170, 50, 50));
 
-        jLabel27.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel27.setText("star1");
-        getContentPane().add(jLabel27, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 170, 50, 50));
+        jLabelStar3Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar3Player1.setText("star1");
+        getContentPane().add(jLabelStar3Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 170, 50, 50));
 
-        jLabel28.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel28.setText("star1");
-        getContentPane().add(jLabel28, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 170, 50, 50));
+        jLabelStar4Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar4Player1.setText("star1");
+        getContentPane().add(jLabelStar4Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 170, 50, 50));
 
-        jLabel22.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel22.setText("star1");
-        getContentPane().add(jLabel22, new org.netbeans.lib.awtextra.AbsoluteConstraints(1240, 160, 50, 50));
+        jLabelStar5Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar5Player2.setText("star1");
+        getContentPane().add(jLabelStar5Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1250, 170, 50, 50));
 
-        jLabel29.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel29.setText("star1");
-        getContentPane().add(jLabel29, new org.netbeans.lib.awtextra.AbsoluteConstraints(1000, 160, 50, 50));
+        jLabelStar1Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar1Player2.setText("star1");
+        getContentPane().add(jLabelStar1Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 170, 50, 50));
 
-        jLabel30.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel30.setText("star1");
-        getContentPane().add(jLabel30, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 160, 50, 50));
+        jLabelStar2Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar2Player2.setText("star1");
+        getContentPane().add(jLabelStar2Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 170, 50, 50));
 
-        jLabel31.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel31.setText("star1");
-        getContentPane().add(jLabel31, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 160, 50, 50));
+        jLabelStar3Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar3Player2.setText("star1");
+        getContentPane().add(jLabelStar3Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 170, 50, 50));
 
-        jLabel32.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
-        jLabel32.setText("star1");
-        getContentPane().add(jLabel32, new org.netbeans.lib.awtextra.AbsoluteConstraints(1180, 160, 50, 50));
+        jLabelStar4Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
+        jLabelStar4Player2.setText("star1");
+        getContentPane().add(jLabelStar4Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 170, 50, 50));
 
         jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
         jLabel18.setText("RESULTADO FINAL");
-        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 550, -1, -1));
+        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 530, -1, -1));
 
         getAccessibleContext().setAccessibleName("SISDEM GAME - Convert In Time");
 
@@ -383,10 +401,15 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
      * @param evt
      */
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
-        isPaused = false;
-        jButtonSetCounter.setEnabled(false);
-        jButtonClear.setEnabled(false);
-        gameProcessing();
+        getMatchDuration();
+        if ((minutes + seconds) > 0) {
+            isPaused = false;
+            jButtonSetCounter.setEnabled(false);
+            jButtonClear.setEnabled(false);
+            gameProcessing();
+        } else {
+            JOptionPane.showMessageDialog(null, "Set a match time bigger than zero.", "Error", 0);
+        }
     }//GEN-LAST:event_jButtonStartActionPerformed
 
     /**
@@ -524,7 +547,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                     EventQueue.invokeLater(() -> {
                         if (!isPaused) {
                             calcRemaningTime();
-                            //gameProcessing();
+                            gameProcessing();
                         } else {
                             //System.out.println("System is paused.");
                         }
@@ -554,19 +577,8 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel21;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel25;
-    private javax.swing.JLabel jLabel26;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JLabel jLabel28;
-    private javax.swing.JLabel jLabel29;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel30;
-    private javax.swing.JLabel jLabel31;
-    private javax.swing.JLabel jLabel32;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -576,6 +588,17 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     private javax.swing.JLabel jLabelImgPlayer1Right;
     private javax.swing.JLabel jLabelImgPlayer1Wrong;
     private javax.swing.JLabel jLabelImgPlayer2Right;
+    private javax.swing.JLabel jLabelImgPlayer2Wrong;
+    private javax.swing.JLabel jLabelStar1Player1;
+    private javax.swing.JLabel jLabelStar1Player2;
+    private javax.swing.JLabel jLabelStar2Player1;
+    private javax.swing.JLabel jLabelStar2Player2;
+    private javax.swing.JLabel jLabelStar3Player1;
+    private javax.swing.JLabel jLabelStar3Player2;
+    private javax.swing.JLabel jLabelStar4Player1;
+    private javax.swing.JLabel jLabelStar4Player2;
+    private javax.swing.JLabel jLabelStar5Player1;
+    private javax.swing.JLabel jLabelStar5Player2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSpinner jSpinnerMinutes;
     private javax.swing.JSpinner jSpinnerSeconds;

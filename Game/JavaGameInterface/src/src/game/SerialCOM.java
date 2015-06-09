@@ -37,8 +37,8 @@ public class SerialCOM implements SerialPortEventListener {
     private int counter;
     private int[] receivedDataBuffer;
     private static final int TIME_OUT = 1000;
-    //private static final int BAUD_RATE = 9600;
-    private static final int BAUD_RATE = 57600;
+    private static final int BAUD_RATE = 9600;
+    //private static final int BAUD_RATE = 57600;
 
     public SerialCOM() {
         counter = 0;
@@ -136,7 +136,7 @@ public class SerialCOM implements SerialPortEventListener {
     /**
      * 
      */
-    private synchronized void showData() {
+    private void showData() {
         for (int i = 0; i < LENGTH_BUFFER; i++) {
             System.out.println(receivedDataBuffer[i]);
         }

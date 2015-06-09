@@ -11,12 +11,12 @@ package src.game;
  */
 public class Player {
 
-    private int nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value_P1;
+    private int nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value;
     private double score;
     private int[] dsw_P1, dsw_P2;
 
     public Player() {
-        nErros = nHits = nSkip = decimal_value_P1 = pushB_confirm = pushB_skip = decimal_value_P1 = 0;
+        nErros = nHits = nSkip = pushB_confirm = pushB_skip = decimal_value = 0;
         dsw_P1 = new int[4];
         dsw_P2 = new int[4];
         score = 0.0;
@@ -40,11 +40,11 @@ public class Player {
     }
 
     public int getDecimal_value_P1() {
-        return decimal_value_P1;
+        return decimal_value;
     }
 
     public void setDecimal_value_P1(int decimal_value_P1) {
-        this.decimal_value_P1 = decimal_value_P1;
+        this.decimal_value = decimal_value_P1;
     }
 
     public int[] getDsw_P1() {
@@ -95,8 +95,8 @@ public class Player {
         this.score = score;
     }
 
-    public double calcScore() {
-        return ((nHits * 2.5) - (nSkip * 1) - (nErros * 1.5));
+    public int calcScore() {
+        return ((nHits * 4) - (nSkip * 2) - (nErros * 1));
     }
 
 }
