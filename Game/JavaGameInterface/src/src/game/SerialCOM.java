@@ -1,145 +1,149 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package src.game;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import gnu.io.CommPortIdentifier;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import java.util.Enumeration;
-import javax.swing.JOptionPane;
+//This class:
+// - Starts up the communication with the Arduino.
+// - Reads the data coming in from the Arduino and
+//   converts that data in to a useful form.
+// - Closes communication with the Arduino.
+//Code builds upon this great example:
+//http://www.csc.kth.se/utbildning/kth/kurser/DH2400/interak06/SerialWork.java
+//The addition being the conversion from incoming characters to numbers. 
+//Load Libraries
+import java.io.*;
+import java.util.TooManyListenersException;
 
-/**
- *
- * @author Eduardo
- */
-public class SerialCOM implements SerialPortEventListener {
+//Load RXTX Library
+import gnu.io.*;
 
-    SerialPort serialPort;
-    /**
-     * The port we're normally going to use.
-     */
-    private static final String PORT_NAMES[] = {
-        "/dev/tty.usbserial-A9007UX1", // Mac OS X
-        "/dev/ttyUSB0", // Linux
-        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9" // Windows
-    };
-    
-    private BufferedReader input;
-    private OutputStream output;
-    private static final int LENGTH_BUFFER = 14;
-    private int counter;
-    private int[] receivedDataBuffer;
-    private static final int TIME_OUT = 1000;
-    private static final int BAUD_RATE = 9600;
-    //private static final int BAUD_RATE = 57600;
+class SerialCOM implements SerialPortEventListener {
 
-    public SerialCOM() {
-        counter = 0;
-        receivedDataBuffer = new int[LENGTH_BUFFER];
+    static final int LENGTH = 4;
+    int[] buffer = new int[LENGTH];
+
+    //Used to in the process of converting the read in characters-
+    //-first in to a string and then into a number.
+    String rawStr = "";
+
+    public int[] getBuffer() {
+        return buffer;
     }
 
-    public int[] getReceivedDataBuffer() {
-        return receivedDataBuffer;
-    }
+    //Declare serial port variable
+    SerialPort mySerialPort;
 
-    public BufferedReader getInput() {
-        return input;
-    }
+    //Declare input steam
+    InputStream in;
+    boolean stop = false;
 
-    public static int getTIME_OUT() {
-        return TIME_OUT;
-    }
-
-    public static int getDATA_RATE() {
-        return BAUD_RATE;
-    }
-
-    /**
-     * 
-     */
-    public void initialize() {
-        CommPortIdentifier portId = null;
-        Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
-
-        //First, Find an instance of serial port as set in PORT_NAMES.
-        while (portEnum.hasMoreElements()) {
-            CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
-            for (String portName : PORT_NAMES) {
-                if (currPortId.getName().equals(portName)) {
-                    portId = currPortId;
-                    break;
-                }
-            }
-        }
-        if (portId == null) {
-            JOptionPane.showMessageDialog(null, "Coul not find COM port.", "Error", 0);
-            System.exit(0);
-        }
-
+    public void start(String portName, int baudRate) {
+        stop = false;
         try {
-            serialPort = (SerialPort) portId.open(this.getClass().getName(), TIME_OUT);
-            serialPort.setSerialPortParams(BAUD_RATE, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+            //Finds and opens the port
+            CommPortIdentifier portId = CommPortIdentifier.getPortIdentifier(portName);
+            mySerialPort = (SerialPort) portId.open("my_java_serial" + portName, 2000);
+            System.out.println("Serial port found and opened");
 
-            // open the streams
-            input = new BufferedReader(new InputStreamReader(serialPort.getInputStream()));
-            output = serialPort.getOutputStream();
-
-            serialPort.addEventListener(this);
-            serialPort.notifyOnDataAvailable(true);
-        } catch (Exception e) {
-            System.err.println(e.toString());
-        }
-    }
-
-    /**
-     * 
-     */
-    public synchronized void close() {
-        if (serialPort != null) {
-            serialPort.removeEventListener();
-            serialPort.close();
-        }
-    }
-
-    /**
-     * 
-     * @param oEvent 
-     */
-    @Override
-    public synchronized void serialEvent(SerialPortEvent oEvent) {
-        if (oEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+            //configure the port
             try {
-                if (counter < LENGTH_BUFFER) {
-                    //System.out.println("CONTADOR = " + counter);
-                    if (input.ready()) {
-                        receivedDataBuffer[counter] = input.read();
-                        counter++;
+                mySerialPort.setSerialPortParams(baudRate,
+                        mySerialPort.DATABITS_8,
+                        mySerialPort.STOPBITS_1,
+                        mySerialPort.PARITY_NONE);
+                System.out.println("Serial port params set: " + baudRate);
+            } catch (UnsupportedCommOperationException e) {
+                System.out.println("Probably an unsupported Speed");
+            }
+
+            //establish stream for reading from the port
+            try {
+                in = mySerialPort.getInputStream();
+            } catch (IOException e) {
+                System.out.println("couldn't get streams");
+            }
+
+            // we could read from "in" in a separate thread, but the API gives us events
+            try {
+                mySerialPort.addEventListener(this);
+                mySerialPort.notifyOnDataAvailable(true);
+                System.out.println("Event listener added");
+            } catch (TooManyListenersException e) {
+                System.out.println("couldn't add listener");
+            }
+        } catch (Exception e) {
+            System.out.println("Port in Use: " + e);
+        }
+    }
+
+    //Used to close the serial port
+    public void closeSerialPort() {
+        try {
+            in.close();
+            stop = true;
+            mySerialPort.close();
+            System.out.println("Serial port closed");
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    //Reads the incoming data packets from Arduino. 
+    @Override
+    public void serialEvent(SerialPortEvent event) {
+
+        //Reads in data while data is available
+        while (event.getEventType() == SerialPortEvent.DATA_AVAILABLE && stop == false) {
+            try {
+            //------------------------------------------------------------------- 
+
+                //Read in the available character
+                char ch = (char) in.read();
+
+                //If the read character is a letter this means that we have found an identifier.
+                if (Character.isLetter(ch) == true && rawStr != "") {
+                    //Convert the string containing all the characters since the last identifier into an integer
+                    int value = Integer.parseInt(rawStr);
+
+                    if (ch == 'A') {
+                        buffer[0] = value;
+                        //System.out.println("\nValue A is: " + value);
                     }
+
+                    if (ch == 'B') {
+                        buffer[1] = value;
+                        //System.out.println("Value B is: " + value);
+                    }
+
+                    if (ch == 'C') {
+                        buffer[2] = value;
+                        //System.out.println("Value C is: " + value);
+                    }
+
+                    if (ch == 'D') {
+                        buffer[3] = value;
+                        //System.out.println("Value D is: " + value);
+                    }
+
+                    for (int i = 0; i < LENGTH; i++) {
+                        System.out.print(buffer[i]);
+                    }
+                    System.out.println();
+                    //Reset rawStr ready for the next reading
+                    rawStr = ("");
                 } else {
-                    counter = 0;
-                    showData();
+                    //Add incoming characters to a string.
+                    //Only add characters to the string if they are digits. 
+                    //When the arduino starts up the first characters it sends through are S-t-a-r-t- 
+                    //and so to avoid adding these characters we only add characters if they are digits.
+
+                    if (Character.isDigit(ch)) {
+                        rawStr = (rawStr + Character.toString(ch));
+                    } else {
+                        //System.out.print(ch);
+                    }
                 }
-            } catch (Exception e) {
-                System.err.println(e.toString());
+            } catch (IOException e) {
             }
         }
-        // Ignore all the other eventTypes, but you should consider the other ones.
-    }
-
-    /**
-     * 
-     */
-    private void showData() {
-        for (int i = 0; i < LENGTH_BUFFER; i++) {
-            System.out.println(receivedDataBuffer[i]);
-        }
-        System.out.println("------- FIM -------\n");
     }
 }

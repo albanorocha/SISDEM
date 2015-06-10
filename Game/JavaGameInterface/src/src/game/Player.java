@@ -11,20 +11,45 @@ package src.game;
  */
 public class Player {
 
+    private int randomValue;
     private int nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value;
     private double score;
-    private int[] dsw_P1, dsw_P2;
+    private int[] dSwitch;
 
     public Player() {
         nErros = nHits = nSkip = pushB_confirm = pushB_skip = decimal_value = 0;
-        dsw_P1 = new int[4];
-        dsw_P2 = new int[4];
+        randomValue = -1; // Invalid value
+        dSwitch = new int[4];
         score = 0.0;
         System.out.println("Player has been created.");
     }
 
-    public int getPushB_confirm() {
-        return pushB_confirm;
+    public int[] getdSwitch() {
+        return dSwitch;
+    }
+
+    public void setdSwitch(int[] dSwitch) {
+        this.dSwitch = dSwitch;
+    }
+
+    public int getRandomValue() {
+        return randomValue;
+    }
+
+    public void setRandomValue(int randomValue) {
+        this.randomValue = randomValue;
+    }
+
+    public int getDecimal_value() {
+        return decimal_value;
+    }
+
+    public void setDecimal_value(int decimal_value) {
+        this.decimal_value = decimal_value;
+    }
+
+    public boolean hasConfirmed() {
+        return (pushB_confirm == 1);
     }
 
     public void setPushB_confirm(int pushB_confirm) {
@@ -37,30 +62,6 @@ public class Player {
 
     public void setPushB_skip(int pushB_skip) {
         this.pushB_skip = pushB_skip;
-    }
-
-    public int getDecimal_value_P1() {
-        return decimal_value;
-    }
-
-    public void setDecimal_value_P1(int decimal_value_P1) {
-        this.decimal_value = decimal_value_P1;
-    }
-
-    public int[] getDsw_P1() {
-        return dsw_P1;
-    }
-
-    public void setDsw_P1(int[] dsw_P1) {
-        this.dsw_P1 = dsw_P1;
-    }
-
-    public int[] getDsw_P2() {
-        return dsw_P2;
-    }
-
-    public void setDsw_P2(int[] dsw_P2) {
-        this.dsw_P2 = dsw_P2;
     }
 
     public int getnHits() {

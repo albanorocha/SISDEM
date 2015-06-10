@@ -13,6 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -21,21 +22,25 @@ import javax.swing.JOptionPane;
  *
  * @author Eduardo
  */
-public class MainFrame extends javax.swing.JFrame implements SerialPortEventListener {
+public class MainFrame extends javax.swing.JFrame {
 
     /**
      * Constants of the system
      */
+    private static final int MAX_DECIMAL_VALUE = 15;
     private static final DateFormat FORMATO = new SimpleDateFormat("mm:ss"); // Format the date type
+    static SerialCOM myArduino = new SerialCOM();
 
     /**
      * Control variables of the system
      */
-    private static SerialCOM arduinoCommunication;   // Serial communication with ArduinoUNO board
+    private SerialCOM arduinoCommunication;   // Serial communication with ArduinoUNO board
+    Random gerador = new Random();
     private int minutes, seconds, remainingTimeSeconds;     // Variables to control counter
     private String counterText;         // Strores counter in String format
     private boolean isPaused;    // Controls counter 
     private Player player1, player2;
+    public int[] receivedDataBuffer;
 
     /**
      * Creates new form MainInterface
@@ -54,6 +59,14 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         Thread clockThread = new Thread(new ClockRunnable(), "Clock Thread");
         clockThread.setDaemon(true);
         clockThread.start();
+
+        /**
+         * Starts thread to update counter.
+         */
+        /*
+         Thread game = new Thread(new GameIA(), "Game Thread");
+         game.setDaemon(true);
+         game.start();*/
     }
 
     /**
@@ -61,8 +74,8 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
      */
     private void initVariables() {
         // Creanting and connecting Serial COM
-        arduinoCommunication = new SerialCOM();
-        arduinoCommunication.initialize();
+        //arduinoCommunication = new SerialCOM();
+        //arduinoCommunication.start("COM3", 9600);
         // Creating players
         player1 = new Player();
         player2 = new Player();
@@ -75,7 +88,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     }
 
     /**
-     * 
+     *
      */
     private void initInterface() {
         // Palyer 01        
@@ -94,8 +107,50 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jLabelStar5Player2.setVisible(false);
         jLabelImgPlayer2Right.setVisible(false);
         jLabelImgPlayer2Wrong.setVisible(false);
+
+        // Actions
+        jButtonStart.setEnabled(false);
+        jButtonReset.setEnabled(false);
+        jToggleButtonPause.setEnabled(false);
     }
 
+    /**
+     * Generate two random values for Players and set on interface
+     */
+    /*
+     private static void generateRandonNumbers() {
+     // Player 01
+     player1.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
+     jTextFieldDecimalRandom1.setText(String.valueOf(player1.getRandomValue()));
+     // Player 02
+     player2.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
+     jTextFieldDecimalRandom2.setText(String.valueOf(player2.getRandomValue()));
+     }*/
+    /**
+     *
+     */
+    /*
+     private static void setBinaresRandom() {
+     // Set binares random values
+     jTextFieldRandomBinaryP1.setText(Integer.toBinaryString(player1.getRandomValue()));
+     jTextFieldRandomBinaryP2.setText(Integer.toBinaryString(player2.getRandomValue()));
+     }*/
+    /**
+     *
+     */
+    /*
+     private void setPlayersValues() {
+     if (isDataBufferReady()) {
+     //if (player1.hasConfirmed()) {
+     jTextFieldDecimalPlayer1.setText(String.valueOf(player1.getDecimal_value()));
+     jTextFieldDecimalPlayer1.setText(String.valueOf(player2.getDecimal_value()));
+     //}
+     //if (player2.hasConfirmed()) {
+     jTextFieldRandomBinaryP1.setText(Integer.toBinaryString(player1.getDecimal_value()));
+     jTextFieldRandomBinaryP2.setText(Integer.toBinaryString(player2.getDecimal_value()));
+     //}
+     }
+     }*/
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,7 +168,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jToggleButtonPause = new javax.swing.JToggleButton();
-        jButtonClear = new javax.swing.JButton();
+        jButtonReset = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -128,15 +183,15 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         jLabel16 = new javax.swing.JLabel();
         jTextFieldRemainigTime = new javax.swing.JTextField();
         jButtonSetCounter = new javax.swing.JButton();
-        jTextFieldDecimalRandom2 = new javax.swing.JTextField();
+        jTextFieldDecimalPlayer2 = new javax.swing.JTextField();
         jTextFieldDecimalRandom1 = new javax.swing.JTextField();
         jTextFieldDecimalPlayer1 = new javax.swing.JTextField();
-        jTextFieldDecimalRandom3 = new javax.swing.JTextField();
+        jTextFieldDecimalRandom2 = new javax.swing.JTextField();
         jSeparator1 = new javax.swing.JSeparator();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
+        jTextFieldBinaryP1 = new javax.swing.JTextField();
+        jTextFieldBinaryP2 = new javax.swing.JTextField();
+        jTextFieldRandomBinaryP1 = new javax.swing.JTextField();
+        jTextFieldRandomBinaryP2 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabelImgPlayer1Wrong = new javax.swing.JLabel();
         jLabelImgPlayer1Right = new javax.swing.JLabel();
@@ -205,8 +260,13 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         });
         getContentPane().add(jToggleButtonPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 590, 160, 100));
 
-        jButtonClear.setText("REINICIAR");
-        getContentPane().add(jButtonClear, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
+        jButtonReset.setText("REINICIAR");
+        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonResetActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jButtonReset, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jLabel9.setText("DURAÇÃO DA PARTIDA");
@@ -226,10 +286,10 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 70, 200, 70));
 
         jLabel14.setText("VALOR INFORMADO (JOGADOR)");
-        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 380, 190, 20));
+        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 380, 190, 20));
 
         jLabel15.setText("VALOR DECIMAL (ALEATÓRIO)");
-        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 250, 190, 20));
+        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 250, 190, 20));
 
         jSpinnerMinutes.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
         jSpinnerMinutes.setToolTipText("");
@@ -265,34 +325,35 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         });
         getContentPane().add(jButtonSetCounter, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 600, 150, 80));
 
-        jTextFieldDecimalRandom2.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 400, 120, 100));
+        jTextFieldDecimalPlayer2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        getContentPane().add(jTextFieldDecimalPlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 400, 120, 100));
 
-        jTextFieldDecimalRandom1.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
+        jTextFieldDecimalRandom1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        jTextFieldDecimalRandom1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
         getContentPane().add(jTextFieldDecimalRandom1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 120, 100));
 
-        jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
+        jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
         getContentPane().add(jTextFieldDecimalPlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 120, 100));
 
-        jTextFieldDecimalRandom3.setFont(new java.awt.Font("Tahoma", 0, 90)); // NOI18N
-        getContentPane().add(jTextFieldDecimalRandom3, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 270, 120, 100));
+        jTextFieldDecimalRandom2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 270, 120, 100));
         getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 520, 1330, 10));
 
-        jTextField1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 425, 180, 55));
+        jTextFieldBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        getContentPane().add(jTextFieldBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 425, 170, 55));
 
-        jTextField2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 420, 180, 55));
+        jTextFieldBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        getContentPane().add(jTextFieldBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 420, 170, 55));
 
-        jTextField3.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        getContentPane().add(jTextField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 180, 55));
+        jTextFieldRandomBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        getContentPane().add(jTextFieldRandomBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 170, 55));
 
-        jTextField4.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        getContentPane().add(jTextField4, new org.netbeans.lib.awtextra.AbsoluteConstraints(1080, 300, 180, 55));
+        jTextFieldRandomBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        getContentPane().add(jTextFieldRandomBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 300, 170, 55));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 120)); // NOI18N
         jLabel5.setText("X");
-        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 320, 70, 130));
+        getContentPane().add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 320, 70, 130));
 
         jLabelImgPlayer1Wrong.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/wrong.jpg"))); // NOI18N
         jLabelImgPlayer1Wrong.setText("Wrong");
@@ -304,11 +365,11 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
 
         jLabelImgPlayer2Right.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/right.jpg"))); // NOI18N
         jLabelImgPlayer2Right.setText("Right");
-        getContentPane().add(jLabelImgPlayer2Right, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 300, 160, 150));
+        getContentPane().add(jLabelImgPlayer2Right, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 300, 160, 150));
 
         jLabelImgPlayer2Wrong.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/wrong.jpg"))); // NOI18N
         jLabelImgPlayer2Wrong.setText("Wrong");
-        getContentPane().add(jLabelImgPlayer2Wrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(730, 300, 160, 150));
+        getContentPane().add(jLabelImgPlayer2Wrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 300, 160, 150));
 
         jLabel13.setText("ESTRELAS:");
         getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 190, -1, -1));
@@ -374,10 +435,13 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
         getMatchDuration();
         try {
             setCouterString(FORMATO.parse(Integer.toString(minutes) + ":" + Integer.toString(seconds)));
+            System.out.println("The game duration has been set.");
         } catch (ParseException ex) {
             Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("The game duration has been set.");
+        jButtonSetCounter.setEnabled(false);
+        jButtonStart.setEnabled(true);
+        jButtonReset.setEnabled(true);
     }//GEN-LAST:event_jButtonSetCounterActionPerformed
 
     /**
@@ -396,21 +460,36 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     }//GEN-LAST:event_jToggleButtonPauseActionPerformed
 
     /**
+     *
+     * @return
+     */
+    private boolean hasTime() {
+        return ((minutes + seconds) > 0);
+    }
+
+    /**
      * Method that starts system's processing.
      *
      * @param evt
      */
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
+        gameProcessing();
         getMatchDuration();
-        if ((minutes + seconds) > 0) {
-            isPaused = false;
-            jButtonSetCounter.setEnabled(false);
-            jButtonClear.setEnabled(false);
-            gameProcessing();
+        isPaused = false;
+        if (hasTime() && !isPaused) {
+//            gameProcessing();
         } else {
-            JOptionPane.showMessageDialog(null, "Set a match time bigger than zero.", "Error", 0);
+            JOptionPane.showMessageDialog(null, "Set the match duration.", "Error", 0);
         }
     }//GEN-LAST:event_jButtonStartActionPerformed
+
+    /**
+     * TO DO
+     * @param evt 
+     */
+    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+
+    }//GEN-LAST:event_jButtonResetActionPerformed
 
     /**
      *
@@ -421,9 +500,6 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     }
 
     /**
-     * Método para atualizar a hora no formulário. Não é thread-safe, portanto,
-     * se o utilizado fora da thread da AWT, deve-se utilizar um dos comandos da
-     * EventQueue (invokeLater ou invokeAndWait).
      *
      * @param date
      */
@@ -472,17 +548,30 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     /**
      *
      */
-    private void gameProcessing() {
+    private static void gameProcessing() {
         System.out.println("The game is running...");
-    }
 
-    /**
-     *
-     * @param spe
-     */
-    @Override
-    public synchronized void serialEvent(SerialPortEvent spe) {
-        arduinoCommunication.serialEvent(spe);
+        if (myArduino.getBuffer()[2] == 1) {
+            if (myArduino.getBuffer()[0] == 15) {
+                System.out.println("ACERTOUUUUUU");
+            } else {
+                System.out.println("GANHOU GIROMBA!!!");
+            }
+        } else {
+            System.out.println("Diferente.");
+        }
+
+        // Random values to be converted by players
+        //generateRandonNumbers();
+        //setPlayersValues();
+        // Processing data coming from Arduino UNO
+        //processingDataBuffer();
+        // Update interface
+        //isPaused = false;
+        //jButtonSetCounter.setEnabled(false);
+        //jButtonReset.setEnabled(true);
+        //jButtonStart.setEnabled(false);
+        //jToggleButtonPause.setEnabled(true);
     }
 
     /**
@@ -500,12 +589,16 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(MainFrame.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(MainFrame.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+
+        myArduino.start("COM3", 9600);
 
         Thread listenSerial;
         listenSerial = new Thread() {
@@ -516,11 +609,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                  * waiting for events to occur and responding to them (printing
                  * incoming messages to console).
                  */
-                //try {
-                //Thread.sleep(1000000);
-                //Thread.sleep(10000);
-                //} catch (InterruptedException ie) {
-                //}
+                gameProcessing();
             }
         };
         listenSerial.start();
@@ -547,9 +636,8 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
                     EventQueue.invokeLater(() -> {
                         if (!isPaused) {
                             calcRemaningTime();
-                            gameProcessing();
                         } else {
-                            //System.out.println("System is paused.");
+                            System.out.println("System is paused.");
                         }
                     });
                     // Fazemos nossa thread dormir por um segundo, liberando o  
@@ -564,7 +652,7 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonClear;
+    private javax.swing.JButton jButtonReset;
     private javax.swing.JButton jButtonSetCounter;
     private javax.swing.JButton jButtonStart;
     private javax.swing.JLabel jLabel1;
@@ -602,14 +690,14 @@ public class MainFrame extends javax.swing.JFrame implements SerialPortEventList
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSpinner jSpinnerMinutes;
     private javax.swing.JSpinner jSpinnerSeconds;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
+    private javax.swing.JTextField jTextFieldBinaryP1;
+    private javax.swing.JTextField jTextFieldBinaryP2;
     private javax.swing.JTextField jTextFieldDecimalPlayer1;
+    private javax.swing.JTextField jTextFieldDecimalPlayer2;
     private javax.swing.JTextField jTextFieldDecimalRandom1;
     private javax.swing.JTextField jTextFieldDecimalRandom2;
-    private javax.swing.JTextField jTextFieldDecimalRandom3;
+    private javax.swing.JTextField jTextFieldRandomBinaryP1;
+    private javax.swing.JTextField jTextFieldRandomBinaryP2;
     private javax.swing.JTextField jTextFieldRemainigTime;
     private javax.swing.JTextField jTextFieldScorePlayer1;
     private javax.swing.JTextField jTextFieldScorePlayer2;
