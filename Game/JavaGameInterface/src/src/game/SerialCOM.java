@@ -17,16 +17,13 @@ import gnu.io.*;
 
 class SerialCOM implements SerialPortEventListener {
 
+    // This LENGTH needs to be according with Arduino code
     static final int LENGTH = 4;
     int[] buffer = new int[LENGTH];
 
     //Used to in the process of converting the read in characters-
     //-first in to a string and then into a number.
     String rawStr = "";
-
-    public int[] getBuffer() {
-        return buffer;
-    }
 
     //Declare serial port variable
     SerialPort mySerialPort;
@@ -145,5 +142,9 @@ class SerialCOM implements SerialPortEventListener {
             } catch (IOException e) {
             }
         }
+    }
+
+    public int[] getBuffer() {
+        return buffer;
     }
 }

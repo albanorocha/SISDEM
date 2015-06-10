@@ -28,19 +28,18 @@ public class MainFrame extends javax.swing.JFrame {
      * Constants of the system
      */
     private static final int MAX_DECIMAL_VALUE = 15;
-    private static final DateFormat FORMATO = new SimpleDateFormat("mm:ss"); // Format the date type
-    static SerialCOM myArduino = new SerialCOM();
+    private static final DateFormat FORMATO = new SimpleDateFormat("mm:ss"); // Format the date type    
 
     /**
      * Control variables of the system
      */
-    private SerialCOM arduinoCommunication;   // Serial communication with ArduinoUNO board
-    Random gerador = new Random();
-    private int minutes, seconds, remainingTimeSeconds;     // Variables to control counter
-    private String counterText;         // Strores counter in String format
-    private boolean isPaused;    // Controls counter 
-    private Player player1, player2;
-    public int[] receivedDataBuffer;
+    private static SerialCOM myArduino = new SerialCOM();
+    private static int[] receivedDataBuffer;
+    private static Random gerador;
+    private static int minutes, seconds, remainingTimeSeconds;     // Variables to control counter
+    private static String counterText;         // Strores counter in String format
+    private static boolean isPaused;    // Controls counter 
+    private static Player player1, player2;
 
     /**
      * Creates new form MainInterface
@@ -59,23 +58,16 @@ public class MainFrame extends javax.swing.JFrame {
         Thread clockThread = new Thread(new ClockRunnable(), "Clock Thread");
         clockThread.setDaemon(true);
         clockThread.start();
-
-        /**
-         * Starts thread to update counter.
-         */
-        /*
-         Thread game = new Thread(new GameIA(), "Game Thread");
-         game.setDaemon(true);
-         game.start();*/
     }
 
     /**
      * Method that starts importants variables.
      */
     private void initVariables() {
-        // Creanting and connecting Serial COM
-        //arduinoCommunication = new SerialCOM();
-        //arduinoCommunication.start("COM3", 9600);
+        // Buffer
+        receivedDataBuffer = new int[SerialCOM.LENGTH];
+        // Random Numbers
+        gerador = new Random();
         // Creating players
         player1 = new Player();
         player2 = new Player();
@@ -115,18 +107,6 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     /**
-     * Generate two random values for Players and set on interface
-     */
-    /*
-     private static void generateRandonNumbers() {
-     // Player 01
-     player1.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
-     jTextFieldDecimalRandom1.setText(String.valueOf(player1.getRandomValue()));
-     // Player 02
-     player2.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
-     jTextFieldDecimalRandom2.setText(String.valueOf(player2.getRandomValue()));
-     }*/
-    /**
      *
      */
     /*
@@ -134,22 +114,6 @@ public class MainFrame extends javax.swing.JFrame {
      // Set binares random values
      jTextFieldRandomBinaryP1.setText(Integer.toBinaryString(player1.getRandomValue()));
      jTextFieldRandomBinaryP2.setText(Integer.toBinaryString(player2.getRandomValue()));
-     }*/
-    /**
-     *
-     */
-    /*
-     private void setPlayersValues() {
-     if (isDataBufferReady()) {
-     //if (player1.hasConfirmed()) {
-     jTextFieldDecimalPlayer1.setText(String.valueOf(player1.getDecimal_value()));
-     jTextFieldDecimalPlayer1.setText(String.valueOf(player2.getDecimal_value()));
-     //}
-     //if (player2.hasConfirmed()) {
-     jTextFieldRandomBinaryP1.setText(Integer.toBinaryString(player1.getDecimal_value()));
-     jTextFieldRandomBinaryP2.setText(Integer.toBinaryString(player2.getDecimal_value()));
-     //}
-     }
      }*/
     /**
      * This method is called from within the constructor to initialize the form.
@@ -441,7 +405,6 @@ public class MainFrame extends javax.swing.JFrame {
         }
         jButtonSetCounter.setEnabled(false);
         jButtonStart.setEnabled(true);
-        jButtonReset.setEnabled(true);
     }//GEN-LAST:event_jButtonSetCounterActionPerformed
 
     /**
@@ -473,19 +436,25 @@ public class MainFrame extends javax.swing.JFrame {
      * @param evt
      */
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
-        gameProcessing();
+        // Update buttons
+        jToggleButtonPause.setEnabled(true);
+        jButtonReset.setEnabled(true);
+        jButtonStart.setEnabled(false);
+
         getMatchDuration();
         isPaused = false;
-        if (hasTime() && !isPaused) {
-//            gameProcessing();
-        } else {
-            JOptionPane.showMessageDialog(null, "Set the match duration.", "Error", 0);
-        }
+        /*
+         if (hasTime() && !isPaused) {
+         gameProcessing();
+         } else {
+         JOptionPane.showMessageDialog(null, "The time is over.", "Error", 0);
+         }*/
     }//GEN-LAST:event_jButtonStartActionPerformed
 
     /**
      * TO DO
-     * @param evt 
+     *
+     * @param evt
      */
     private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
 
@@ -550,20 +519,73 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private static void gameProcessing() {
         System.out.println("The game is running...");
-
-        if (myArduino.getBuffer()[2] == 1) {
-            if (myArduino.getBuffer()[0] == 15) {
-                System.out.println("ACERTOUUUUUU");
-            } else {
-                System.out.println("GANHOU GIROMBA!!!");
+        /**
+         * Generating random values and updating interface...
+         */
+        try {
+            if (!player1.isBusy()) {
+                // Player 01
+                player1.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
+                jTextFieldDecimalRandom1.setText(String.valueOf(player1.getRandomValue()));
+                player1.setBusy(true);
             }
-        } else {
-            System.out.println("Diferente.");
-        }
+            if (!player2.isBusy()) {
+                // Player 02
+                player2.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
+                jTextFieldDecimalRandom2.setText(String.valueOf(player2.getRandomValue()));
+                player2.setBusy(true);
+            }
 
-        // Random values to be converted by players
-        //generateRandonNumbers();
-        //setPlayersValues();
+            /**
+             * Make a copy of the SerialCOM buffer.
+             */
+            receivedDataBuffer = myArduino.getBuffer();
+            /**
+             * Copy values from buffer and set players' atributes.
+             */
+            // Player 01
+            player1.setDecimal_value(receivedDataBuffer[0]);
+            if (receivedDataBuffer[2] == 1) {
+                player1.setPushB_confirm(1);
+            }
+            if (receivedDataBuffer[2] == 2) {
+                player1.setPushB_skip(1);
+            }
+            // Player 02
+            player2.setDecimal_value(receivedDataBuffer[1]);
+            if (receivedDataBuffer[3] == 1) {
+                player2.setPushB_confirm(1);
+            }
+            if (receivedDataBuffer[3] == 2) {
+                player2.setPushB_skip(1);
+            }
+
+            /**
+             * Starting testing...
+             */
+            if (player1.hasConfirmed()) {
+                System.out.println("PLAYER 1 - CONFIRMADO");
+                jTextFieldDecimalPlayer1.setText(String.valueOf(player1.getDecimal_value()));
+                jTextFieldBinaryP1.setText(Integer.toBinaryString(player1.getDecimal_value()));
+                player1.setPushB_confirm(0);                
+            }
+            if (player1.hasSkipped()) {
+                System.out.println("PLAYER 1 - PULOU");
+                player1.setPushB_skip(0);
+            }
+            if (player2.hasConfirmed()) {
+                System.out.println("PLAYER 2 - CONFIRMADO");
+                jTextFieldDecimalPlayer2.setText(String.valueOf(player2.getDecimal_value()));
+                jTextFieldBinaryP2.setText(Integer.toBinaryString(player2.getDecimal_value()));
+                player2.setPushB_confirm(0);
+            }
+            if (player2.hasSkipped()) {
+                System.out.println("PLAYER 2 - PULOU");
+                player2.setPushB_skip(0);
+            }
+        } catch (NullPointerException ex) {
+            //
+        }
         // Processing data coming from Arduino UNO
         //processingDataBuffer();
         // Update interface
@@ -571,7 +593,7 @@ public class MainFrame extends javax.swing.JFrame {
         //jButtonSetCounter.setEnabled(false);
         //jButtonReset.setEnabled(true);
         //jButtonStart.setEnabled(false);
-        //jToggleButtonPause.setEnabled(true);
+        //jToggleButtonPause.setEnabled(true);        
     }
 
     /**
@@ -600,24 +622,27 @@ public class MainFrame extends javax.swing.JFrame {
 
         myArduino.start("COM3", 9600);
 
-        Thread listenSerial;
-        listenSerial = new Thread() {
-            @Override
-            public void run() {
-                /**
-                 * The following line will keep this app alive for 1000 seconds,
-                 * waiting for events to occur and responding to them (printing
-                 * incoming messages to console).
-                 */
-                gameProcessing();
-            }
-        };
-        listenSerial.start();
-
-        /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
             new MainFrame().setVisible(true);
         });
+
+        Thread game;
+        game = new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        if (!isPaused) {
+                            gameProcessing();
+                        }
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        game.start();
     }
 
     /**
@@ -690,17 +715,17 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSpinner jSpinnerMinutes;
     private javax.swing.JSpinner jSpinnerSeconds;
-    private javax.swing.JTextField jTextFieldBinaryP1;
-    private javax.swing.JTextField jTextFieldBinaryP2;
-    private javax.swing.JTextField jTextFieldDecimalPlayer1;
-    private javax.swing.JTextField jTextFieldDecimalPlayer2;
-    private javax.swing.JTextField jTextFieldDecimalRandom1;
-    private javax.swing.JTextField jTextFieldDecimalRandom2;
-    private javax.swing.JTextField jTextFieldRandomBinaryP1;
-    private javax.swing.JTextField jTextFieldRandomBinaryP2;
+    private static javax.swing.JTextField jTextFieldBinaryP1;
+    private static javax.swing.JTextField jTextFieldBinaryP2;
+    private static javax.swing.JTextField jTextFieldDecimalPlayer1;
+    private static javax.swing.JTextField jTextFieldDecimalPlayer2;
+    private static javax.swing.JTextField jTextFieldDecimalRandom1;
+    private static javax.swing.JTextField jTextFieldDecimalRandom2;
+    private static javax.swing.JTextField jTextFieldRandomBinaryP1;
+    private static javax.swing.JTextField jTextFieldRandomBinaryP2;
     private javax.swing.JTextField jTextFieldRemainigTime;
-    private javax.swing.JTextField jTextFieldScorePlayer1;
-    private javax.swing.JTextField jTextFieldScorePlayer2;
+    private static javax.swing.JTextField jTextFieldScorePlayer1;
+    private static javax.swing.JTextField jTextFieldScorePlayer2;
     private javax.swing.JToggleButton jToggleButtonPause;
     // End of variables declaration//GEN-END:variables
 }

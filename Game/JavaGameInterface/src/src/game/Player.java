@@ -14,6 +14,7 @@ public class Player {
     private int randomValue;
     private int nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value;
     private double score;
+    private boolean busy;
     private int[] dSwitch;
 
     public Player() {
@@ -21,7 +22,16 @@ public class Player {
         randomValue = -1; // Invalid value
         dSwitch = new int[4];
         score = 0.0;
+        busy = false;
         System.out.println("Player has been created.");
+    }
+    
+    public void setBusy(boolean value){
+        busy = value;
+    }
+    
+    public boolean isBusy(){
+        return (busy);
     }
 
     public int[] getdSwitch() {
@@ -50,6 +60,10 @@ public class Player {
 
     public boolean hasConfirmed() {
         return (pushB_confirm == 1);
+    }
+    
+    public boolean hasSkipped(){
+        return (pushB_skip == 1);
     }
 
     public void setPushB_confirm(int pushB_confirm) {
