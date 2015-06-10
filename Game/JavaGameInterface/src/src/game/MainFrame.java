@@ -5,8 +5,6 @@
  */
 package src.game;
 
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
 import java.awt.EventQueue;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -38,7 +36,7 @@ public class MainFrame extends javax.swing.JFrame {
     private static Random gerador;
     private static int minutes, seconds, remainingTimeSeconds;     // Variables to control counter
     private static String counterText;         // Strores counter in String format
-    private static boolean isPaused;    // Controls counter 
+    private static boolean isPaused, systemEnable;    // Controls counter 
     private static Player player1, player2;
 
     /**
@@ -63,7 +61,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      * Method that starts importants variables.
      */
-    private void initVariables() {
+    private static void initVariables() {
         // Buffer
         receivedDataBuffer = new int[SerialCOM.LENGTH];
         // Random Numbers
@@ -74,7 +72,9 @@ public class MainFrame extends javax.swing.JFrame {
         // Seting up auxiliar variables
         minutes = seconds = remainingTimeSeconds = 0;
         counterText = null;
+        // Variables that controls systems' flow's control
         isPaused = true;
+        systemEnable = false;
         // Get text that represents time in String format
         getCounterString();
     }
@@ -82,7 +82,7 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      *
      */
-    private void initInterface() {
+    private static void initInterface() {
         // Palyer 01        
         jLabelStar1Player1.setVisible(false);
         jLabelStar2Player1.setVisible(false);
@@ -102,7 +102,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         // Actions
         jButtonStart.setEnabled(false);
-        jButtonReset.setEnabled(false);
+        jButtonRestart.setEnabled(false);
         jToggleButtonPause.setEnabled(false);
     }
 
@@ -132,7 +132,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jToggleButtonPause = new javax.swing.JToggleButton();
-        jButtonReset = new javax.swing.JButton();
+        jButtonRestart = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -198,6 +198,7 @@ public class MainFrame extends javax.swing.JFrame {
         jTextFieldScorePlayer1.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
         jTextFieldScorePlayer1.setText("0");
         jTextFieldScorePlayer1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        jTextFieldScorePlayer1.setEnabled(false);
         getContentPane().add(jTextFieldScorePlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 70, 200, 70));
 
         jButtonStart.setText("INICIAR");
@@ -224,13 +225,13 @@ public class MainFrame extends javax.swing.JFrame {
         });
         getContentPane().add(jToggleButtonPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 590, 160, 100));
 
-        jButtonReset.setText("REINICIAR");
-        jButtonReset.addActionListener(new java.awt.event.ActionListener() {
+        jButtonRestart.setText("REINICIAR");
+        jButtonRestart.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonResetActionPerformed(evt);
+                jButtonRestartActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonReset, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
+        getContentPane().add(jButtonRestart, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
 
         jLabel9.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jLabel9.setText("DURAÇÃO DA PARTIDA");
@@ -247,6 +248,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jTextFieldScorePlayer2.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
         jTextFieldScorePlayer2.setText("0");
+        jTextFieldScorePlayer2.setEnabled(false);
         getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 70, 200, 70));
 
         jLabel14.setText("VALOR INFORMADO (JOGADOR)");
@@ -290,29 +292,37 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(jButtonSetCounter, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 600, 150, 80));
 
         jTextFieldDecimalPlayer2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        jTextFieldDecimalPlayer2.setEnabled(false);
         getContentPane().add(jTextFieldDecimalPlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 400, 120, 100));
 
         jTextFieldDecimalRandom1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
         jTextFieldDecimalRandom1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+        jTextFieldDecimalRandom1.setEnabled(false);
         getContentPane().add(jTextFieldDecimalRandom1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 120, 100));
 
         jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        jTextFieldDecimalPlayer1.setEnabled(false);
         getContentPane().add(jTextFieldDecimalPlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 120, 100));
 
         jTextFieldDecimalRandom2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        jTextFieldDecimalRandom2.setEnabled(false);
         getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 270, 120, 100));
         getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 520, 1330, 10));
 
         jTextFieldBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        jTextFieldBinaryP1.setEnabled(false);
         getContentPane().add(jTextFieldBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 425, 170, 55));
 
         jTextFieldBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        jTextFieldBinaryP2.setEnabled(false);
         getContentPane().add(jTextFieldBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 420, 170, 55));
 
         jTextFieldRandomBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        jTextFieldRandomBinaryP1.setEnabled(false);
         getContentPane().add(jTextFieldRandomBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 170, 55));
 
         jTextFieldRandomBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
+        jTextFieldRandomBinaryP2.setEnabled(false);
         getContentPane().add(jTextFieldRandomBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 300, 170, 55));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 120)); // NOI18N
@@ -381,7 +391,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelStar4Player2.setText("star1");
         getContentPane().add(jLabelStar4Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 170, 50, 50));
 
-        jLabel19.setText("LOGOMARCA SISDEM + CONECTANDO");
+        jLabel19.setText("                       LOGOMARCA SISDEM + CONECTANDO");
         getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 540, 350, 150));
 
         getAccessibleContext().setAccessibleName("SISDEM GAME - Convert In Time");
@@ -422,32 +432,23 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jToggleButtonPauseActionPerformed
 
     /**
-     *
-     * @return
-     */
-    private boolean hasTime() {
-        return ((minutes + seconds) > 0);
-    }
-
-    /**
      * Method that starts system's processing.
      *
      * @param evt
      */
     private void jButtonStartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonStartActionPerformed
+        // Match duration
+        getMatchDuration();
+        calcRemaningTime();
+
         // Update buttons
         jToggleButtonPause.setEnabled(true);
-        jButtonReset.setEnabled(true);
+        jButtonRestart.setEnabled(true);
         jButtonStart.setEnabled(false);
 
-        getMatchDuration();
+        // Active system
         isPaused = false;
-        /*
-         if (hasTime() && !isPaused) {
-         gameProcessing();
-         } else {
-         JOptionPane.showMessageDialog(null, "The time is over.", "Error", 0);
-         }*/
+        systemEnable = true;
     }//GEN-LAST:event_jButtonStartActionPerformed
 
     /**
@@ -455,14 +456,22 @@ public class MainFrame extends javax.swing.JFrame {
      *
      * @param evt
      */
-    private void jButtonResetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonResetActionPerformed
+    private void jButtonRestartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestartActionPerformed
 
-    }//GEN-LAST:event_jButtonResetActionPerformed
+    }//GEN-LAST:event_jButtonRestartActionPerformed
+
+    /**
+     *
+     * @return
+     */
+    private static boolean hasTime() {
+        return (remainingTimeSeconds > 0);
+    }
 
     /**
      *
      */
-    private void getCounterString() {
+    private static void getCounterString() {
         // Get text from counterText
         counterText = jTextFieldRemainigTime.getText();
     }
@@ -516,6 +525,67 @@ public class MainFrame extends javax.swing.JFrame {
     /**
      *
      */
+    private static void updateStars() {
+        // PLAYER 01
+        jLabelStar1Player1.setVisible(false);
+        jLabelStar2Player1.setVisible(false);
+        jLabelStar3Player1.setVisible(false);
+        jLabelStar4Player1.setVisible(false);
+        jLabelStar5Player1.setVisible(false);
+        if (player1.getScore() >= 10 && player1.getScore() < 20) {
+            jLabelStar1Player1.setVisible(true);
+        } else if (player1.getScore() >= 20 && player1.getScore() < 30) {
+            jLabelStar1Player1.setVisible(true);
+            jLabelStar2Player1.setVisible(true);
+        } else if (player1.getScore() >= 30 && player1.getScore() < 40) {
+            jLabelStar1Player1.setVisible(true);
+            jLabelStar2Player1.setVisible(true);
+            jLabelStar3Player1.setVisible(true);
+        } else if (player1.getScore() >= 40 && player1.getScore() < 50) {
+            jLabelStar1Player1.setVisible(true);
+            jLabelStar2Player1.setVisible(true);
+            jLabelStar3Player1.setVisible(true);
+            jLabelStar4Player1.setVisible(true);
+        } else if (player1.getScore() >= 50) {
+            jLabelStar1Player1.setVisible(true);
+            jLabelStar2Player1.setVisible(true);
+            jLabelStar3Player1.setVisible(true);
+            jLabelStar4Player1.setVisible(true);
+            jLabelStar5Player1.setVisible(true);
+        }
+
+        // PLAYER 02
+        jLabelStar1Player2.setVisible(false);
+        jLabelStar2Player2.setVisible(false);
+        jLabelStar3Player2.setVisible(false);
+        jLabelStar4Player2.setVisible(false);
+        jLabelStar5Player2.setVisible(false);
+        if (player2.getScore() >= 10 && player2.getScore() < 20) {
+            jLabelStar1Player2.setVisible(true);
+        } else if (player2.getScore() >= 20 && player2.getScore() < 30) {
+            jLabelStar1Player2.setVisible(true);
+            jLabelStar2Player2.setVisible(true);
+        } else if (player2.getScore() >= 30 && player2.getScore() < 40) {
+            jLabelStar1Player2.setVisible(true);
+            jLabelStar2Player2.setVisible(true);
+            jLabelStar3Player2.setVisible(true);
+        } else if (player2.getScore() >= 40 && player2.getScore() < 50) {
+            jLabelStar1Player2.setVisible(true);
+            jLabelStar2Player2.setVisible(true);
+            jLabelStar3Player2.setVisible(true);
+            jLabelStar4Player2.setVisible(true);
+        } else if (player2.getScore() >= 50) {
+            jLabelStar1Player2.setVisible(true);
+            jLabelStar2Player2.setVisible(true);
+            jLabelStar3Player2.setVisible(true);
+            jLabelStar4Player2.setVisible(true);
+            jLabelStar5Player2.setVisible(true);
+        }
+    }
+
+    /**
+     *
+     */
     private static void gameProcessing() {
         try {
             /**
@@ -525,6 +595,8 @@ public class MainFrame extends javax.swing.JFrame {
             System.out.println("The game is running...");
             jTextFieldScorePlayer1.setText(String.valueOf(player1.getScore()));
             jTextFieldScorePlayer2.setText(String.valueOf(player2.getScore()));
+            updateStars();
+
             if (!player1.isBusy()) {
                 // Player 01
                 player1.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
@@ -577,8 +649,8 @@ public class MainFrame extends javax.swing.JFrame {
                     System.out.println("PLAYER 1 - ACERTOU");
                     player1.setScore(player1.getScore() + 5);
                     jLabelImgPlayer1Right.setVisible(true);
-                    jLabelImgPlayer1Wrong.setVisible(false);                    
-                    player1.setBusy(false);                    
+                    jLabelImgPlayer1Wrong.setVisible(false);
+                    player1.setBusy(false);
                 } else {
                     System.out.println("PLAYER 1 - ERROU");
                     if ((player1.getScore() - 2) > 0) {
@@ -676,8 +748,12 @@ public class MainFrame extends javax.swing.JFrame {
             public void run() {
                 while (true) {
                     try {
-                        if (!isPaused) {
+                        if (!isPaused && hasTime()) {
                             gameProcessing();
+                        }
+                        if (!hasTime() && systemEnable) {
+                            JOptionPane.showMessageDialog(null, "A partida acabou!", "FIM", 0);
+                            systemEnable = false;
                         }
                         Thread.sleep(250);
                     } catch (InterruptedException ex) {
@@ -721,9 +797,9 @@ public class MainFrame extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButtonReset;
-    private javax.swing.JButton jButtonSetCounter;
-    private javax.swing.JButton jButtonStart;
+    private static javax.swing.JButton jButtonRestart;
+    private static javax.swing.JButton jButtonSetCounter;
+    private static javax.swing.JButton jButtonStart;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -746,16 +822,16 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabelImgPlayer1Wrong;
     private static javax.swing.JLabel jLabelImgPlayer2Right;
     private static javax.swing.JLabel jLabelImgPlayer2Wrong;
-    private javax.swing.JLabel jLabelStar1Player1;
-    private javax.swing.JLabel jLabelStar1Player2;
-    private javax.swing.JLabel jLabelStar2Player1;
-    private javax.swing.JLabel jLabelStar2Player2;
-    private javax.swing.JLabel jLabelStar3Player1;
-    private javax.swing.JLabel jLabelStar3Player2;
-    private javax.swing.JLabel jLabelStar4Player1;
-    private javax.swing.JLabel jLabelStar4Player2;
-    private javax.swing.JLabel jLabelStar5Player1;
-    private javax.swing.JLabel jLabelStar5Player2;
+    private static javax.swing.JLabel jLabelStar1Player1;
+    private static javax.swing.JLabel jLabelStar1Player2;
+    private static javax.swing.JLabel jLabelStar2Player1;
+    private static javax.swing.JLabel jLabelStar2Player2;
+    private static javax.swing.JLabel jLabelStar3Player1;
+    private static javax.swing.JLabel jLabelStar3Player2;
+    private static javax.swing.JLabel jLabelStar4Player1;
+    private static javax.swing.JLabel jLabelStar4Player2;
+    private static javax.swing.JLabel jLabelStar5Player1;
+    private static javax.swing.JLabel jLabelStar5Player2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSpinner jSpinnerMinutes;
     private javax.swing.JSpinner jSpinnerSeconds;
@@ -767,9 +843,9 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JTextField jTextFieldDecimalRandom2;
     private static javax.swing.JTextField jTextFieldRandomBinaryP1;
     private static javax.swing.JTextField jTextFieldRandomBinaryP2;
-    private javax.swing.JTextField jTextFieldRemainigTime;
+    private static javax.swing.JTextField jTextFieldRemainigTime;
     private static javax.swing.JTextField jTextFieldScorePlayer1;
     private static javax.swing.JTextField jTextFieldScorePlayer2;
-    private javax.swing.JToggleButton jToggleButtonPause;
+    private static javax.swing.JToggleButton jToggleButtonPause;
     // End of variables declaration//GEN-END:variables
 }
