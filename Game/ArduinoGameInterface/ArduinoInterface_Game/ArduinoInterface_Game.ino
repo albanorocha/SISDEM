@@ -16,15 +16,15 @@ void loop(){
   int confirmP2 = (analogRead(A2) > 1000) ? 1 : 0;
   int skipP2 = (analogRead(A3) < 500) ? 1 : 0;
   
-  int dsw1P1 = digitalRead(13);
-  int dsw2P1 = digitalRead(12);
-  int dsw3P1 = digitalRead(11);
-  int dsw4P1 = digitalRead(10);
+  int dsw1P1 = digitalRead(10);
+  int dsw2P1 = digitalRead(11);
+  int dsw3P1 = digitalRead(12);
+  int dsw4P1 = digitalRead(13);
   
-  int dsw1P2 = digitalRead(9);
-  int dsw2P2 = digitalRead(8);
-  int dsw3P2 = digitalRead(7);
-  int dsw4P2 = digitalRead(6);
+  int dsw1P2 = digitalRead(6);
+  int dsw2P2 = digitalRead(7);
+  int dsw3P2 = digitalRead(8);
+  int dsw4P2 = digitalRead(9);
   
   // Function to convert binary value from dip switches in an equivalent decimal value
   int A = dsw1P1*8 + dsw2P1*4 + dsw3P1*2 + dsw4P1;

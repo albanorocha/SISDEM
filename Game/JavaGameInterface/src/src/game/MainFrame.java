@@ -173,10 +173,10 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelStar2Player2 = new javax.swing.JLabel();
         jLabelStar3Player2 = new javax.swing.JLabel();
         jLabelStar4Player2 = new javax.swing.JLabel();
-        jLabel18 = new javax.swing.JLabel();
+        jLabel19 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("SISDEM GAME - Convert In Time Game");
+        setTitle("SISDEM - MÓDULO GAMIFICADO (Converting in Time)");
         setBackground(new java.awt.Color(255, 255, 255));
         setMaximumSize(new java.awt.Dimension(1366, 768));
         setMinimumSize(new java.awt.Dimension(1366, 768));
@@ -381,9 +381,8 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelStar4Player2.setText("star1");
         getContentPane().add(jLabelStar4Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 170, 50, 50));
 
-        jLabel18.setFont(new java.awt.Font("Tahoma", 0, 30)); // NOI18N
-        jLabel18.setText("RESULTADO FINAL");
-        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 530, -1, -1));
+        jLabel19.setText("LOGOMARCA SISDEM + CONECTANDO");
+        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 540, 350, 150));
 
         getAccessibleContext().setAccessibleName("SISDEM GAME - Convert In Time");
 
@@ -518,11 +517,14 @@ public class MainFrame extends javax.swing.JFrame {
      *
      */
     private static void gameProcessing() {
-        System.out.println("The game is running...");
-        /**
-         * Generating random values and updating interface...
-         */
         try {
+            /**
+             * Generating random values and updating interface if player is not
+             * busy.
+             */
+            System.out.println("The game is running...");
+            jTextFieldScorePlayer1.setText(String.valueOf(player1.getScore()));
+            jTextFieldScorePlayer2.setText(String.valueOf(player2.getScore()));
             if (!player1.isBusy()) {
                 // Player 01
                 player1.setRandomValue(gerador.nextInt(MAX_DECIMAL_VALUE));
@@ -540,6 +542,7 @@ public class MainFrame extends javax.swing.JFrame {
              * Make a copy of the SerialCOM buffer.
              */
             receivedDataBuffer = myArduino.getBuffer();
+
             /**
              * Copy values from buffer and set players' atributes.
              */
@@ -563,37 +566,78 @@ public class MainFrame extends javax.swing.JFrame {
             /**
              * Starting testing...
              */
+            // PLAYER 01
             if (player1.hasConfirmed()) {
                 System.out.println("PLAYER 1 - CONFIRMADO");
                 jTextFieldDecimalPlayer1.setText(String.valueOf(player1.getDecimal_value()));
                 jTextFieldBinaryP1.setText(Integer.toBinaryString(player1.getDecimal_value()));
-                player1.setPushB_confirm(0);                
+                player1.setPushB_confirm(0);
+
+                if (player1.getRandomValue() == player1.getDecimal_value()) {
+                    System.out.println("PLAYER 1 - ACERTOU");
+                    player1.setScore(player1.getScore() + 5);
+                    jLabelImgPlayer1Right.setVisible(true);
+                    jLabelImgPlayer1Wrong.setVisible(false);                    
+                    player1.setBusy(false);                    
+                } else {
+                    System.out.println("PLAYER 1 - ERROU");
+                    if ((player1.getScore() - 2) > 0) {
+                        player1.setScore(player1.getScore() - 2);
+                    } else {
+                        player1.setScore(0);
+                    }
+                    jLabelImgPlayer1Wrong.setVisible(true);
+                    jLabelImgPlayer1Right.setVisible(false);
+                }
             }
+
             if (player1.hasSkipped()) {
                 System.out.println("PLAYER 1 - PULOU");
+                if ((player1.getScore() - 1) > 0) {
+                    player1.setScore(player1.getScore() - 1);
+                } else {
+                    player1.setScore(0);
+                }
                 player1.setPushB_skip(0);
+                player1.setBusy(false);
             }
+
+            // PLAYER 02
             if (player2.hasConfirmed()) {
                 System.out.println("PLAYER 2 - CONFIRMADO");
                 jTextFieldDecimalPlayer2.setText(String.valueOf(player2.getDecimal_value()));
                 jTextFieldBinaryP2.setText(Integer.toBinaryString(player2.getDecimal_value()));
                 player2.setPushB_confirm(0);
+                if (player2.getRandomValue() == player2.getDecimal_value()) {
+                    System.out.println("PLAYER 2 - ACERTOU");
+                    player2.setScore(player2.getScore() + 5);
+                    jLabelImgPlayer2Right.setVisible(true);
+                    jLabelImgPlayer2Wrong.setVisible(false);
+                    player2.setBusy(false);
+                } else {
+                    System.out.println("PLAYER 2 - ERROU");
+                    if ((player2.getScore() - 2) > 0) {
+                        player2.setScore(player2.getScore() - 2);
+                    } else {
+                        player2.setScore(0);
+                    }
+                    jLabelImgPlayer2Wrong.setVisible(true);
+                    jLabelImgPlayer2Right.setVisible(false);
+                }
             }
             if (player2.hasSkipped()) {
                 System.out.println("PLAYER 2 - PULOU");
+                if ((player2.getScore() - 1) > 0) {
+                    player2.setScore(player2.getScore() - 1);
+                } else {
+                    player2.setScore(0);
+                }
                 player2.setPushB_skip(0);
+                player2.setBusy(false);
             }
         } catch (NullPointerException ex) {
             //
         }
-        // Processing data coming from Arduino UNO
-        //processingDataBuffer();
-        // Update interface
-        //isPaused = false;
-        //jButtonSetCounter.setEnabled(false);
-        //jButtonReset.setEnabled(true);
-        //jButtonStart.setEnabled(false);
-        //jToggleButtonPause.setEnabled(true);        
     }
 
     /**
@@ -635,7 +679,7 @@ public class MainFrame extends javax.swing.JFrame {
                         if (!isPaused) {
                             gameProcessing();
                         }
-                        Thread.sleep(100);
+                        Thread.sleep(250);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -689,7 +733,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -698,10 +742,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    private javax.swing.JLabel jLabelImgPlayer1Right;
-    private javax.swing.JLabel jLabelImgPlayer1Wrong;
-    private javax.swing.JLabel jLabelImgPlayer2Right;
-    private javax.swing.JLabel jLabelImgPlayer2Wrong;
+    private static javax.swing.JLabel jLabelImgPlayer1Right;
+    private static javax.swing.JLabel jLabelImgPlayer1Wrong;
+    private static javax.swing.JLabel jLabelImgPlayer2Right;
+    private static javax.swing.JLabel jLabelImgPlayer2Wrong;
     private javax.swing.JLabel jLabelStar1Player1;
     private javax.swing.JLabel jLabelStar1Player2;
     private javax.swing.JLabel jLabelStar2Player1;

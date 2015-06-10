@@ -11,9 +11,8 @@ package src.game;
  */
 public class Player {
 
-    private int randomValue;
-    private int nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value;
-    private double score;
+    private int randomValue, nHits, nErros, nSkip, pushB_confirm, pushB_skip, decimal_value;
+    private int score;
     private boolean busy;
     private int[] dSwitch;
 
@@ -21,16 +20,16 @@ public class Player {
         nErros = nHits = nSkip = pushB_confirm = pushB_skip = decimal_value = 0;
         randomValue = -1; // Invalid value
         dSwitch = new int[4];
-        score = 0.0;
+        score = 0;
         busy = false;
         System.out.println("Player has been created.");
     }
-    
-    public void setBusy(boolean value){
+
+    public void setBusy(boolean value) {
         busy = value;
     }
-    
-    public boolean isBusy(){
+
+    public boolean isBusy() {
         return (busy);
     }
 
@@ -61,8 +60,8 @@ public class Player {
     public boolean hasConfirmed() {
         return (pushB_confirm == 1);
     }
-    
-    public boolean hasSkipped(){
+
+    public boolean hasSkipped() {
         return (pushB_skip == 1);
     }
 
@@ -102,16 +101,11 @@ public class Player {
         this.nSkip = nSkip;
     }
 
-    public double getScore() {
+    public int getScore() {
         return score;
     }
 
-    public void setScore(double score) {
+    public void setScore(int score) {
         this.score = score;
     }
-
-    public int calcScore() {
-        return ((nHits * 4) - (nSkip * 2) - (nErros * 1));
-    }
-
 }
