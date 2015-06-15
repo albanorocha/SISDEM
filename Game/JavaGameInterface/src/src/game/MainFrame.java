@@ -100,21 +100,11 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelImgPlayer2Right.setVisible(false);
         jLabelImgPlayer2Wrong.setVisible(false);
 
-        // Actions
-        jButtonStart.setEnabled(false);
-        jButtonRestart.setEnabled(false);
+        // Comp
+        jButtonStart.setEnabled(false);        
         jToggleButtonPause.setEnabled(false);
     }
 
-    /**
-     *
-     */
-    /*
-     private static void setBinaresRandom() {
-     // Set binares random values
-     jTextFieldRandomBinaryP1.setText(Integer.toBinaryString(player1.getRandomValue()));
-     jTextFieldRandomBinaryP2.setText(Integer.toBinaryString(player2.getRandomValue()));
-     }*/
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -132,7 +122,6 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jToggleButtonPause = new javax.swing.JToggleButton();
-        jButtonRestart = new javax.swing.JButton();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
@@ -154,8 +143,6 @@ public class MainFrame extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jTextFieldBinaryP1 = new javax.swing.JTextField();
         jTextFieldBinaryP2 = new javax.swing.JTextField();
-        jTextFieldRandomBinaryP1 = new javax.swing.JTextField();
-        jTextFieldRandomBinaryP2 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jLabelImgPlayer1Wrong = new javax.swing.JLabel();
         jLabelImgPlayer1Right = new javax.swing.JLabel();
@@ -173,7 +160,10 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelStar2Player2 = new javax.swing.JLabel();
         jLabelStar3Player2 = new javax.swing.JLabel();
         jLabelStar4Player2 = new javax.swing.JLabel();
-        jLabel19 = new javax.swing.JLabel();
+        jLabel18 = new javax.swing.JLabel();
+        jLabel20 = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("SISDEM - MÓDULO GAMIFICADO (Converting in Time)");
@@ -184,22 +174,24 @@ public class MainFrame extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(1366, 768));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Tempus Sans ITC", 1, 22)); // NOI18N
         jLabel1.setText("JOGADOR 01");
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 20, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Tempus Sans ITC", 1, 22)); // NOI18N
         jLabel2.setText("JOGADOR 02");
         getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 20, -1, -1));
 
-        jLabel3.setText("PONTUAÇÃO : ");
-        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
+        jLabel3.setFont(new java.awt.Font("Tempus Sans ITC", 1, 15)); // NOI18N
+        jLabel3.setText("PONTUAÇÃO: ");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 120, -1));
 
-        jTextFieldScorePlayer1.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
+        jTextFieldScorePlayer1.setEditable(false);
+        jTextFieldScorePlayer1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextFieldScorePlayer1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
         jTextFieldScorePlayer1.setText("0");
         jTextFieldScorePlayer1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        jTextFieldScorePlayer1.setEnabled(false);
-        getContentPane().add(jTextFieldScorePlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 70, 200, 70));
+        getContentPane().add(jTextFieldScorePlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 70, 200, 60));
 
         jButtonStart.setText("INICIAR");
         jButtonStart.addActionListener(new java.awt.event.ActionListener() {
@@ -207,15 +199,15 @@ public class MainFrame extends javax.swing.JFrame {
                 jButtonStartActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 590, 220, 50));
+        getContentPane().add(jButtonStart, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 590, 210, 100));
 
-        jLabel7.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Tempus Sans ITC", 1, 36)); // NOI18N
         jLabel7.setText("TEMPO RESTANTE");
-        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(520, 0, 310, 60));
+        getContentPane().add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 0, 340, 60));
 
-        jLabel8.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel8.setText("AÇÕES");
-        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(1060, 550, -1, -1));
+        getContentPane().add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 540, -1, -1));
 
         jToggleButtonPause.setText("PAUSAR / CONTINUAR");
         jToggleButtonPause.addActionListener(new java.awt.event.ActionListener() {
@@ -225,45 +217,47 @@ public class MainFrame extends javax.swing.JFrame {
         });
         getContentPane().add(jToggleButtonPause, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 590, 160, 100));
 
-        jButtonRestart.setText("REINICIAR");
-        jButtonRestart.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonRestartActionPerformed(evt);
-            }
-        });
-        getContentPane().add(jButtonRestart, new org.netbeans.lib.awtextra.AbsoluteConstraints(910, 650, 220, 40));
-
-        jLabel9.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel9.setText("DURAÇÃO DA PARTIDA");
-        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 550, 220, 30));
+        getContentPane().add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 540, 250, 30));
 
+        jLabel10.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel10.setText("VALOR INFORMADO (JOGADOR)");
-        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 380, 200, 20));
+        getContentPane().add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 390, -1, -1));
 
+        jLabel11.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel11.setText("VALOR DECIMAL (ALEATÓRIO)");
-        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 250, 190, 20));
+        getContentPane().add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 230, 320, 30));
 
-        jLabel12.setText("PONTUAÇÃO :");
-        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 100, -1, -1));
+        jLabel12.setFont(new java.awt.Font("Tempus Sans ITC", 1, 15)); // NOI18N
+        jLabel12.setText("PONTUAÇÃO:");
+        getContentPane().add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 90, -1, -1));
 
-        jTextFieldScorePlayer2.setFont(new java.awt.Font("Tahoma", 0, 70)); // NOI18N
+        jTextFieldScorePlayer2.setEditable(false);
+        jTextFieldScorePlayer2.setBackground(new java.awt.Color(255, 255, 255));
+        jTextFieldScorePlayer2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
         jTextFieldScorePlayer2.setText("0");
-        jTextFieldScorePlayer2.setEnabled(false);
-        getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 70, 200, 70));
+        getContentPane().add(jTextFieldScorePlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 70, 200, 60));
 
+        jLabel14.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel14.setText("VALOR INFORMADO (JOGADOR)");
-        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 380, 190, 20));
+        getContentPane().add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(960, 390, 340, 20));
 
+        jLabel15.setFont(new java.awt.Font("Tempus Sans ITC", 1, 20)); // NOI18N
         jLabel15.setText("VALOR DECIMAL (ALEATÓRIO)");
-        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(1140, 250, 190, 20));
+        getContentPane().add(jLabel15, new org.netbeans.lib.awtextra.AbsoluteConstraints(980, 230, 320, 30));
 
         jSpinnerMinutes.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jSpinnerMinutes.setModel(new javax.swing.SpinnerNumberModel(2, 0, 10, 1));
         jSpinnerMinutes.setToolTipText("");
+        jSpinnerMinutes.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jSpinnerMinutes.setEditor(new javax.swing.JSpinner.NumberEditor(jSpinnerMinutes, ""));
         jSpinnerMinutes.setName(""); // NOI18N
         jSpinnerMinutes.setValue(2);
         getContentPane().add(jSpinnerMinutes, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 610, 80, 70));
 
         jSpinnerSeconds.setFont(new java.awt.Font("Tahoma", 0, 36)); // NOI18N
+        jSpinnerSeconds.setModel(new javax.swing.SpinnerNumberModel(30, 0, 59, 1));
         jSpinnerSeconds.setValue(30);
         getContentPane().add(jSpinnerSeconds, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 610, 80, 70));
 
@@ -278,6 +272,7 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(jLabel16, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 630, 20, -1));
 
         jTextFieldRemainigTime.setEditable(false);
+        jTextFieldRemainigTime.setBackground(new java.awt.Color(255, 255, 255));
         jTextFieldRemainigTime.setFont(new java.awt.Font("Tahoma", 0, 140)); // NOI18N
         jTextFieldRemainigTime.setText("00:00");
         getContentPane().add(jTextFieldRemainigTime, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 60, 370, 190));
@@ -289,41 +284,42 @@ public class MainFrame extends javax.swing.JFrame {
                 jButtonSetCounterActionPerformed(evt);
             }
         });
-        getContentPane().add(jButtonSetCounter, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 600, 150, 80));
+        getContentPane().add(jButtonSetCounter, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 610, 150, 70));
 
-        jTextFieldDecimalPlayer2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
-        jTextFieldDecimalPlayer2.setEnabled(false);
-        getContentPane().add(jTextFieldDecimalPlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 400, 120, 100));
+        jTextFieldDecimalPlayer2.setEditable(false);
+        jTextFieldDecimalPlayer2.setBackground(new java.awt.Color(255, 255, 255));
+        jTextFieldDecimalPlayer2.setFont(new java.awt.Font("Tahoma", 0, 60)); // NOI18N
+        getContentPane().add(jTextFieldDecimalPlayer2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 430, 100, 90));
 
+        jTextFieldDecimalRandom1.setEditable(false);
+        jTextFieldDecimalRandom1.setBackground(new java.awt.Color(255, 255, 255));
         jTextFieldDecimalRandom1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
+        jTextFieldDecimalRandom1.setForeground(new java.awt.Color(204, 0, 0));
         jTextFieldDecimalRandom1.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
-        jTextFieldDecimalRandom1.setEnabled(false);
-        getContentPane().add(jTextFieldDecimalRandom1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 270, 120, 100));
+        getContentPane().add(jTextFieldDecimalRandom1, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 270, 120, 100));
 
-        jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
-        jTextFieldDecimalPlayer1.setEnabled(false);
-        getContentPane().add(jTextFieldDecimalPlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 400, 120, 100));
+        jTextFieldDecimalPlayer1.setEditable(false);
+        jTextFieldDecimalPlayer1.setBackground(new java.awt.Color(255, 255, 255));
+        jTextFieldDecimalPlayer1.setFont(new java.awt.Font("Tahoma", 0, 60)); // NOI18N
+        jTextFieldDecimalPlayer1.setAutoscrolls(false);
+        getContentPane().add(jTextFieldDecimalPlayer1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 430, 100, 90));
 
+        jTextFieldDecimalRandom2.setEditable(false);
+        jTextFieldDecimalRandom2.setBackground(new java.awt.Color(255, 255, 255));
         jTextFieldDecimalRandom2.setFont(new java.awt.Font("Tahoma", 0, 100)); // NOI18N
-        jTextFieldDecimalRandom2.setEnabled(false);
-        getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1160, 270, 120, 100));
-        getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 520, 1330, 10));
+        jTextFieldDecimalRandom2.setForeground(new java.awt.Color(204, 0, 0));
+        getContentPane().add(jTextFieldDecimalRandom2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1090, 270, 120, 100));
+        getContentPane().add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 530, 1330, 10));
 
+        jTextFieldBinaryP1.setEditable(false);
+        jTextFieldBinaryP1.setBackground(new java.awt.Color(255, 255, 255));
         jTextFieldBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextFieldBinaryP1.setEnabled(false);
-        getContentPane().add(jTextFieldBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 425, 170, 55));
+        getContentPane().add(jTextFieldBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 445, 170, 55));
 
+        jTextFieldBinaryP2.setEditable(false);
+        jTextFieldBinaryP2.setBackground(new java.awt.Color(255, 255, 255));
         jTextFieldBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextFieldBinaryP2.setEnabled(false);
-        getContentPane().add(jTextFieldBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 420, 170, 55));
-
-        jTextFieldRandomBinaryP1.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextFieldRandomBinaryP1.setEnabled(false);
-        getContentPane().add(jTextFieldRandomBinaryP1, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 170, 55));
-
-        jTextFieldRandomBinaryP2.setFont(new java.awt.Font("Tahoma", 0, 50)); // NOI18N
-        jTextFieldRandomBinaryP2.setEnabled(false);
-        getContentPane().add(jTextFieldRandomBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 300, 170, 55));
+        getContentPane().add(jTextFieldBinaryP2, new org.netbeans.lib.awtextra.AbsoluteConstraints(990, 445, 170, 55));
 
         jLabel5.setFont(new java.awt.Font("Tahoma", 0, 120)); // NOI18N
         jLabel5.setText("X");
@@ -345,54 +341,64 @@ public class MainFrame extends javax.swing.JFrame {
         jLabelImgPlayer2Wrong.setText("Wrong");
         getContentPane().add(jLabelImgPlayer2Wrong, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 300, 160, 150));
 
+        jLabel13.setFont(new java.awt.Font("Tempus Sans ITC", 1, 15)); // NOI18N
         jLabel13.setText("ESTRELAS:");
-        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(940, 190, -1, -1));
+        getContentPane().add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 180, -1, -1));
 
+        jLabel17.setFont(new java.awt.Font("Tempus Sans ITC", 1, 15)); // NOI18N
         jLabel17.setText("ESTRELAS:");
-        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 190, -1, -1));
+        getContentPane().add(jLabel17, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
 
         jLabelStar5Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar5Player1.setText("star1");
-        getContentPane().add(jLabelStar5Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 170, 50, 50));
+        getContentPane().add(jLabelStar5Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 160, 50, 50));
 
+        jLabelStar1Player1.setBackground(new java.awt.Color(153, 153, 153));
         jLabelStar1Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar1Player1.setText("star1");
-        getContentPane().add(jLabelStar1Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 170, 50, 50));
+        getContentPane().add(jLabelStar1Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 160, 50, 50));
 
         jLabelStar2Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar2Player1.setText("star1");
-        getContentPane().add(jLabelStar2Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 170, 50, 50));
+        getContentPane().add(jLabelStar2Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 160, 50, 50));
 
         jLabelStar3Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar3Player1.setText("star1");
-        getContentPane().add(jLabelStar3Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 170, 50, 50));
+        getContentPane().add(jLabelStar3Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 160, 50, 50));
 
         jLabelStar4Player1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar4Player1.setText("star1");
-        getContentPane().add(jLabelStar4Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 170, 50, 50));
+        getContentPane().add(jLabelStar4Player1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, 50, 50));
 
         jLabelStar5Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar5Player2.setText("star1");
-        getContentPane().add(jLabelStar5Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1250, 170, 50, 50));
+        getContentPane().add(jLabelStar5Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1250, 160, 50, 50));
 
         jLabelStar1Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar1Player2.setText("star1");
-        getContentPane().add(jLabelStar1Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 170, 50, 50));
+        getContentPane().add(jLabelStar1Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1010, 160, 50, 50));
 
         jLabelStar2Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar2Player2.setText("star1");
-        getContentPane().add(jLabelStar2Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 170, 50, 50));
+        getContentPane().add(jLabelStar2Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1070, 160, 50, 50));
 
         jLabelStar3Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar3Player2.setText("star1");
-        getContentPane().add(jLabelStar3Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 170, 50, 50));
+        getContentPane().add(jLabelStar3Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1130, 160, 50, 50));
 
         jLabelStar4Player2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imgs/star.png"))); // NOI18N
         jLabelStar4Player2.setText("star1");
-        getContentPane().add(jLabelStar4Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 170, 50, 50));
+        getContentPane().add(jLabelStar4Player2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1190, 160, 50, 50));
 
-        jLabel19.setText("                       LOGOMARCA SISDEM + CONECTANDO");
-        getContentPane().add(jLabel19, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 540, 350, 150));
+        jLabel18.setFont(new java.awt.Font("Tempus Sans ITC", 0, 40)); // NOI18N
+        jLabel18.setText("SISDEM - GAME");
+        getContentPane().add(jLabel18, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 550, 290, 60));
+
+        jLabel20.setFont(new java.awt.Font("Tempus Sans ITC", 3, 25)); // NOI18N
+        jLabel20.setText("Converting in Time");
+        getContentPane().add(jLabel20, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 610, 230, 30));
+        getContentPane().add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 50, 140, 10));
+        getContentPane().add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 50, 140, -1));
 
         getAccessibleContext().setAccessibleName("SISDEM GAME - Convert In Time");
 
@@ -442,23 +448,13 @@ public class MainFrame extends javax.swing.JFrame {
         calcRemaningTime();
 
         // Update buttons
-        jToggleButtonPause.setEnabled(true);
-        jButtonRestart.setEnabled(true);
+        jToggleButtonPause.setEnabled(true);        
         jButtonStart.setEnabled(false);
 
         // Active system
         isPaused = false;
         systemEnable = true;
     }//GEN-LAST:event_jButtonStartActionPerformed
-
-    /**
-     * TO DO
-     *
-     * @param evt
-     */
-    private void jButtonRestartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonRestartActionPerformed
-
-    }//GEN-LAST:event_jButtonRestartActionPerformed
 
     /**
      *
@@ -480,7 +476,7 @@ public class MainFrame extends javax.swing.JFrame {
      *
      * @param date
      */
-    public void setCouterString(Date date) {
+    private void setCouterString(Date date) {
         jTextFieldRemainigTime.setText(FORMATO.format(date));
     }
 
@@ -527,26 +523,27 @@ public class MainFrame extends javax.swing.JFrame {
      */
     private static void updateStars() {
         // PLAYER 01
-        jLabelStar1Player1.setVisible(false);
-        jLabelStar2Player1.setVisible(false);
-        jLabelStar3Player1.setVisible(false);
-        jLabelStar4Player1.setVisible(false);
-        jLabelStar5Player1.setVisible(false);
-        if (player1.getScore() >= 10 && player1.getScore() < 20) {
+        if (player1.getScore() < 20) {
+            jLabelStar1Player1.setVisible(false);
+            jLabelStar2Player1.setVisible(false);
+            jLabelStar3Player1.setVisible(false);
+            jLabelStar4Player1.setVisible(false);
+            jLabelStar5Player1.setVisible(false);
+        } else if (player1.getScore() >= 20 && player1.getScore() < 40) {
             jLabelStar1Player1.setVisible(true);
-        } else if (player1.getScore() >= 20 && player1.getScore() < 30) {
+        } else if (player1.getScore() >= 40 && player1.getScore() < 60) {
             jLabelStar1Player1.setVisible(true);
             jLabelStar2Player1.setVisible(true);
-        } else if (player1.getScore() >= 30 && player1.getScore() < 40) {
+        } else if (player1.getScore() >= 60 && player1.getScore() < 80) {
             jLabelStar1Player1.setVisible(true);
             jLabelStar2Player1.setVisible(true);
             jLabelStar3Player1.setVisible(true);
-        } else if (player1.getScore() >= 40 && player1.getScore() < 50) {
+        } else if (player1.getScore() >= 80 && player1.getScore() < 100) {
             jLabelStar1Player1.setVisible(true);
             jLabelStar2Player1.setVisible(true);
             jLabelStar3Player1.setVisible(true);
             jLabelStar4Player1.setVisible(true);
-        } else if (player1.getScore() >= 50) {
+        } else if (player1.getScore() >= 120) {
             jLabelStar1Player1.setVisible(true);
             jLabelStar2Player1.setVisible(true);
             jLabelStar3Player1.setVisible(true);
@@ -555,26 +552,27 @@ public class MainFrame extends javax.swing.JFrame {
         }
 
         // PLAYER 02
-        jLabelStar1Player2.setVisible(false);
-        jLabelStar2Player2.setVisible(false);
-        jLabelStar3Player2.setVisible(false);
-        jLabelStar4Player2.setVisible(false);
-        jLabelStar5Player2.setVisible(false);
-        if (player2.getScore() >= 10 && player2.getScore() < 20) {
+        if (player2.getScore() < 20) {
+            jLabelStar1Player2.setVisible(false);
+            jLabelStar2Player2.setVisible(false);
+            jLabelStar3Player2.setVisible(false);
+            jLabelStar4Player2.setVisible(false);
+            jLabelStar5Player2.setVisible(false);
+        } else if (player2.getScore() >= 20 && player2.getScore() < 40) {
             jLabelStar1Player2.setVisible(true);
-        } else if (player2.getScore() >= 20 && player2.getScore() < 30) {
+        } else if (player2.getScore() >= 40 && player2.getScore() < 60) {
             jLabelStar1Player2.setVisible(true);
             jLabelStar2Player2.setVisible(true);
-        } else if (player2.getScore() >= 30 && player2.getScore() < 40) {
+        } else if (player2.getScore() >= 60 && player2.getScore() < 80) {
             jLabelStar1Player2.setVisible(true);
             jLabelStar2Player2.setVisible(true);
             jLabelStar3Player2.setVisible(true);
-        } else if (player2.getScore() >= 40 && player2.getScore() < 50) {
+        } else if (player2.getScore() >= 80 && player2.getScore() < 100) {
             jLabelStar1Player2.setVisible(true);
             jLabelStar2Player2.setVisible(true);
             jLabelStar3Player2.setVisible(true);
             jLabelStar4Player2.setVisible(true);
-        } else if (player2.getScore() >= 50) {
+        } else if (player2.getScore() >= 120) {
             jLabelStar1Player2.setVisible(true);
             jLabelStar2Player2.setVisible(true);
             jLabelStar3Player2.setVisible(true);
@@ -755,7 +753,8 @@ public class MainFrame extends javax.swing.JFrame {
                             JOptionPane.showMessageDialog(null, "A partida acabou!", "FIM", 0);
                             systemEnable = false;
                         }
-                        Thread.sleep(250);
+                        //Thread.sleep(250);
+                        Thread.sleep(200);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(MainFrame.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -797,7 +796,6 @@ public class MainFrame extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private static javax.swing.JButton jButtonRestart;
     private static javax.swing.JButton jButtonSetCounter;
     private static javax.swing.JButton jButtonStart;
     private javax.swing.JLabel jLabel1;
@@ -809,8 +807,9 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
-    private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
@@ -833,6 +832,8 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JLabel jLabelStar5Player1;
     private static javax.swing.JLabel jLabelStar5Player2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSpinner jSpinnerMinutes;
     private javax.swing.JSpinner jSpinnerSeconds;
     private static javax.swing.JTextField jTextFieldBinaryP1;
@@ -841,8 +842,6 @@ public class MainFrame extends javax.swing.JFrame {
     private static javax.swing.JTextField jTextFieldDecimalPlayer2;
     private static javax.swing.JTextField jTextFieldDecimalRandom1;
     private static javax.swing.JTextField jTextFieldDecimalRandom2;
-    private static javax.swing.JTextField jTextFieldRandomBinaryP1;
-    private static javax.swing.JTextField jTextFieldRandomBinaryP2;
     private static javax.swing.JTextField jTextFieldRemainigTime;
     private static javax.swing.JTextField jTextFieldScorePlayer1;
     private static javax.swing.JTextField jTextFieldScorePlayer2;
